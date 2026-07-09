@@ -2634,14 +2634,15 @@ function drawDreamPoster() {
   const canvas = exportCanvas;
   const ctx = canvas.getContext("2d");
   const width = 1200;
-  const height = 1800;
-  canvas.width = width;
-  canvas.height = height;
 
   const dreams = dreamsForCurrentUser();
   const groups = groupDreamsByCategory(dreams);
   const doneCount = dreams.filter((dream) => dream.done).length;
   const progress = dreams.length ? Math.round((doneCount / dreams.length) * 100) : 0;
+  const layout = posterDreamLayout(groups, 650);
+  const height = Math.max(1800, layout.height + 92);
+  canvas.width = width;
+  canvas.height = height;
 
   ctx.fillStyle = "#fffdf9";
   ctx.fillRect(0, 0, width, height);
@@ -2651,7 +2652,7 @@ function drawDreamPoster() {
 
   drawPosterHeader(ctx, user.name, dreams.length, doneCount, progress);
   drawPosterPyramid(ctx, groups);
-  drawPosterDreamGroups(ctx, groups, 650, height - 92);
+  drawPosterDreamGroups(ctx, layout);
 }
 
 function drawPosterHeader(ctx, userNameText, total, done, progress) {
@@ -2706,36 +2707,50 @@ function drawPosterPyramid(ctx, groups) {
   });
 }
 
-function drawPosterDreamGroups(ctx, groups, startY, bottomLimit) {
+function posterDreamLayout(groups, startY) {
+  const totalItems = groups.reduce((sum, group) => sum + group.dreams.length, 0) || 1;
+  const itemHeight = totalItems > 44 ? 30 : totalItems > 32 ? 34 : 38;
+  const groupGap = totalItems > 36 ? 18 : 24;
+  const boxPadding = 70;
+  const boxMeta = groups.map((group) => ({
+    group,
+    itemHeight,
+    boxHeight: boxPadding + group.dreams.length * itemHeight,
+  }));
+  const contentHeight = boxMeta.reduce((sum, item) => sum + item.boxHeight, 0) + Math.max(0, boxMeta.length - 1) * groupGap;
+  return {
+    startY,
+    itemHeight,
+    itemFont: itemHeight < 34 ? 21 : 24,
+    groupGap,
+    groups: boxMeta,
+    height: startY + contentHeight,
+  };
+}
+
+function drawPosterDreamGroups(ctx, layout) {
   const left = 116;
   const right = 1084;
   const boxWidth = right - left;
-  const totalItems = groups.reduce((sum, group) => sum + group.dreams.length, 0) || 1;
-  const available = bottomLimit - startY;
-  const itemHeight = clamp(Math.floor((available - groups.length * 58) / totalItems), 28, 46);
-  const titleFont = itemHeight < 34 ? 22 : 26;
-  const itemFont = itemHeight < 34 ? 21 : 25;
-  let y = startY;
+  let y = layout.startY;
 
-  groups.forEach((group) => {
+  layout.groups.forEach(({ group, boxHeight }) => {
     const dreams = [...group.dreams].sort((a, b) => Number(a.done) - Number(b.done) || a.createdAt - b.createdAt);
-    const boxHeight = 48 + dreams.length * itemHeight + 22;
-    if (y + boxHeight > bottomLimit) return;
 
     drawDashedBox(ctx, left, y, boxWidth, boxHeight);
     drawPosterChip(ctx, right - 210, y + 28, 190, 48, group.category.color, group.category.name);
 
     dreams.forEach((dream, index) => {
-      const itemY = y + 56 + index * itemHeight;
+      const itemY = y + 56 + index * layout.itemHeight;
       drawPosterCheck(ctx, left + 28, itemY - 22, group.category.color, dream.done);
       ctx.textAlign = "left";
       ctx.fillStyle = dream.done ? "#2a2f38" : "#171a20";
-      ctx.font = `500 ${itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
+      ctx.font = `500 ${layout.itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
       const title = truncateCanvasText(ctx, dream.title, boxWidth - 360);
       ctx.fillText(title, left + 92, itemY + 4);
     });
 
-    y += boxHeight + 24;
+    y += boxHeight + layout.groupGap;
   });
 }
 
