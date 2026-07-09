@@ -439,10 +439,28 @@ button[type="submit"],
   font-size: 22px;
 }
 
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .ghost {
   background: rgba(255, 255, 255, 0.56);
   color: var(--ink);
   border: 1px solid var(--line);
+}
+
+.primary-lite {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1d2430, #0d5d85);
+  color: #fff;
+  font-weight: 760;
+  white-space: nowrap;
+  box-shadow: 0 10px 22px rgba(13, 93, 133, 0.18);
 }
 
 .dream-list {
@@ -948,6 +966,79 @@ button[type="submit"],
   line-height: 1.6;
 }
 
+.export-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(29, 36, 48, 0.44);
+  backdrop-filter: blur(12px);
+}
+
+.export-dialog {
+  width: min(1060px, 100%);
+  max-height: min(92vh, 980px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background: rgba(248, 250, 248, 0.96);
+  box-shadow: 0 32px 90px rgba(12, 18, 28, 0.3);
+}
+
+.export-head,
+.export-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.export-head p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.export-canvas-wrap {
+  overflow: auto;
+  padding: 18px;
+  background:
+    linear-gradient(90deg, rgba(29, 36, 48, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(29, 36, 48, 0.035) 1px, transparent 1px),
+    #edf2ef;
+  background-size: 30px 30px;
+}
+
+.export-canvas-wrap canvas {
+  display: block;
+  width: min(100%, 720px);
+  height: auto;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 18px 54px rgba(24, 32, 42, 0.18);
+}
+
+.export-actions {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.export-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 760;
+}
+
 .stats-panel {
   margin-top: 18px;
   min-height: 520px;
@@ -1209,7 +1300,10 @@ button[type="submit"],
         <section class="list-panel">
           <div class="panel-head">
             <h2 id="viewTitle">全部梦想</h2>
-            <button id="resetDemo" class="ghost" type="button">恢复我的初始清单</button>
+            <div class="panel-actions">
+              <button id="exportPoster" class="primary-lite" type="button">预览/下载清单</button>
+              <button id="resetDemo" class="ghost" type="button">恢复我的初始清单</button>
+            </div>
           </div>
           <div id="dreamList" class="dream-list" aria-live="polite"></div>
         </section>
@@ -1255,6 +1349,25 @@ button[type="submit"],
     <div id="celebrationToast" class="celebration-toast" role="status" aria-live="polite" hidden>
       <strong id="celebrationTitle"></strong>
       <span id="celebrationText"></span>
+    </div>
+
+    <div id="exportModal" class="export-modal" hidden>
+      <div class="export-dialog" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <div class="export-head">
+          <div>
+            <h2 id="exportTitle">梦想清单预览</h2>
+            <p>这是一张自动整理好的单页清单，可以直接下载分享。</p>
+          </div>
+          <button id="closeExport" class="ghost" type="button">关闭</button>
+        </div>
+        <div class="export-canvas-wrap">
+          <canvas id="exportCanvas" width="1200" height="1800"></canvas>
+        </div>
+        <div class="export-actions">
+          <button id="downloadPoster" type="button">下载 PNG</button>
+          <button id="printPoster" class="ghost" type="button">打印/保存 PDF</button>
+        </div>
+      </div>
     </div>
 
     <template id="dreamTemplate">
@@ -1373,6 +1486,12 @@ const subtitle = document.querySelector("#subtitle");
 const celebrationToast = document.querySelector("#celebrationToast");
 const celebrationTitle = document.querySelector("#celebrationTitle");
 const celebrationText = document.querySelector("#celebrationText");
+const exportPosterButton = document.querySelector("#exportPoster");
+const exportModal = document.querySelector("#exportModal");
+const closeExportButton = document.querySelector("#closeExport");
+const downloadPosterButton = document.querySelector("#downloadPoster");
+const printPosterButton = document.querySelector("#printPoster");
+const exportCanvas = document.querySelector("#exportCanvas");
 let celebrationTimer = null;
 
 function loadState() {
@@ -2259,6 +2378,241 @@ function sortByUserThenTime(a, b) {
   return b.createdAt - a.createdAt;
 }
 
+function openExportPreview() {
+  const user = currentUser();
+  if (!user) return;
+  const dreams = dreamsForCurrentUser();
+  if (!dreams.length) {
+    alert("先写下一个梦想，再生成你的梦想清单。");
+    return;
+  }
+  drawDreamPoster();
+  exportModal.hidden = false;
+}
+
+function closeExportPreview() {
+  exportModal.hidden = true;
+}
+
+function downloadDreamPoster() {
+  drawDreamPoster();
+  const user = currentUser();
+  const link = document.createElement("a");
+  link.download = `${user?.name || "我的"}的梦想清单.png`;
+  link.href = exportCanvas.toDataURL("image/png");
+  link.click();
+}
+
+function printDreamPoster() {
+  drawDreamPoster();
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) return;
+  const imageUrl = exportCanvas.toDataURL("image/png");
+  printWindow.document.write(`
+    <!doctype html>
+    <html lang="zh-CN">
+      <head>
+        <meta charset="utf-8" />
+        <title>梦想清单</title>
+        <style>
+          body { margin: 0; display: grid; place-items: center; background: #f4f6f4; }
+          img { width: min(100vw, 800px); height: auto; }
+          @media print {
+            body { background: #fff; }
+            img { width: 100%; page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body><img src="${imageUrl}" alt="梦想清单" /></body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
+function drawDreamPoster() {
+  const user = currentUser();
+  if (!user || !exportCanvas) return;
+  const canvas = exportCanvas;
+  const ctx = canvas.getContext("2d");
+  const width = 1200;
+  const height = 1800;
+  canvas.width = width;
+  canvas.height = height;
+
+  const dreams = dreamsForCurrentUser();
+  const groups = groupDreamsByCategory(dreams);
+  const doneCount = dreams.filter((dream) => dream.done).length;
+  const progress = dreams.length ? Math.round((doneCount / dreams.length) * 100) : 0;
+
+  ctx.fillStyle = "#fffdf9";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#8a623e";
+  ctx.lineWidth = 7;
+  ctx.strokeRect(36, 36, width - 72, height - 72);
+
+  drawPosterHeader(ctx, user.name, dreams.length, doneCount, progress);
+  drawPosterPyramid(ctx, groups);
+  drawPosterDreamGroups(ctx, groups, 650, height - 92);
+}
+
+function drawPosterHeader(ctx, userNameText, total, done, progress) {
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#171a20";
+  ctx.font = "700 46px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(`${userNameText}的梦想清单`, 600, 105);
+
+  ctx.font = "600 22px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillStyle = "#6d7280";
+  ctx.fillText(`${total} 个梦想 · ${done} 个已完成 · 完成度 ${progress}%`, 600, 148);
+}
+
+function drawPosterPyramid(ctx, groups) {
+  const categories = groups.length ? groups.map((group) => group.category) : defaultCategories.slice(0, 5);
+  const levels = categories.slice(0, 8);
+  const topY = 210;
+  const bottomY = 545;
+  const centerX = 690;
+  const topWidth = 56;
+  const bottomWidth = 500;
+  const levelHeight = (bottomY - topY) / levels.length;
+
+  levels.forEach((category, index) => {
+    const y1 = topY + index * levelHeight;
+    const y2 = topY + (index + 1) * levelHeight;
+    const ratio1 = (y1 - topY) / (bottomY - topY);
+    const ratio2 = (y2 - topY) / (bottomY - topY);
+    const half1 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio1;
+    const half2 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio2;
+    ctx.beginPath();
+    ctx.moveTo(centerX - half1, y1);
+    ctx.lineTo(centerX + half1, y1);
+    ctx.lineTo(centerX + half2, y2);
+    ctx.lineTo(centerX - half2, y2);
+    ctx.closePath();
+    ctx.fillStyle = category.color;
+    ctx.globalAlpha = 0.94;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    const labelY = y1 + levelHeight / 2;
+    drawPosterCheck(ctx, 180, labelY - 17, category.color, true);
+    drawPosterChip(ctx, 240, labelY - 22, 230, 44, category.color, category.name);
+
+    ctx.strokeStyle = category.color;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(470, labelY);
+    ctx.lineTo(centerX - (half1 + half2) / 2 - 8, labelY);
+    ctx.stroke();
+  });
+}
+
+function drawPosterDreamGroups(ctx, groups, startY, bottomLimit) {
+  const left = 116;
+  const right = 1084;
+  const boxWidth = right - left;
+  const totalItems = groups.reduce((sum, group) => sum + group.dreams.length, 0) || 1;
+  const available = bottomLimit - startY;
+  const itemHeight = clamp(Math.floor((available - groups.length * 58) / totalItems), 28, 46);
+  const titleFont = itemHeight < 34 ? 22 : 26;
+  const itemFont = itemHeight < 34 ? 21 : 25;
+  let y = startY;
+
+  groups.forEach((group) => {
+    const dreams = [...group.dreams].sort((a, b) => Number(a.done) - Number(b.done) || a.createdAt - b.createdAt);
+    const boxHeight = 48 + dreams.length * itemHeight + 22;
+    if (y + boxHeight > bottomLimit) return;
+
+    drawDashedBox(ctx, left, y, boxWidth, boxHeight);
+    drawPosterChip(ctx, right - 210, y + 28, 190, 48, group.category.color, group.category.name);
+
+    dreams.forEach((dream, index) => {
+      const itemY = y + 56 + index * itemHeight;
+      drawPosterCheck(ctx, left + 28, itemY - 22, group.category.color, dream.done);
+      ctx.textAlign = "left";
+      ctx.fillStyle = dream.done ? "#2a2f38" : "#171a20";
+      ctx.font = `500 ${itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
+      const title = truncateCanvasText(ctx, dream.title, boxWidth - 360);
+      ctx.fillText(title, left + 92, itemY + 4);
+    });
+
+    y += boxHeight + 24;
+  });
+}
+
+function drawDashedBox(ctx, x, y, width, height) {
+  ctx.save();
+  ctx.strokeStyle = "#171a20";
+  ctx.lineWidth = 3;
+  ctx.setLineDash([30, 18]);
+  ctx.strokeRect(x, y, width, height);
+  ctx.restore();
+}
+
+function drawPosterCheck(ctx, x, y, color, checked) {
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#9aa0ad";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, 36, 36);
+  if (checked) {
+    ctx.strokeStyle = "#ff1c18";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(x + 8, y + 20);
+    ctx.lineTo(x + 16, y + 28);
+    ctx.lineTo(x + 30, y + 8);
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 3, y + 3, 30, 30);
+  }
+  ctx.restore();
+}
+
+function drawPosterChip(ctx, x, y, width, height, color, text) {
+  ctx.save();
+  ctx.fillStyle = color;
+  roundRect(ctx, x, y, width, height, 8);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "700 22px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(truncateCanvasText(ctx, text, width - 24), x + width / 2, y + height / 2 + 8);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function truncateCanvasText(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let result = text;
+  while (result.length > 1 && ctx.measureText(`${result}…`).width > maxWidth) {
+    result = result.slice(0, -1);
+  }
+  return `${result}…`;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function login(name) {
   const trimmedName = name.trim();
   if (!trimmedName) return;
@@ -2360,6 +2714,14 @@ document.querySelector("#resetDemo").addEventListener("click", () => {
   );
   activeFilter = "all";
   render();
+});
+
+exportPosterButton.addEventListener("click", openExportPreview);
+closeExportButton.addEventListener("click", closeExportPreview);
+downloadPosterButton.addEventListener("click", downloadDreamPoster);
+printPosterButton.addEventListener("click", printDreamPoster);
+exportModal.addEventListener("click", (event) => {
+  if (event.target === exportModal) closeExportPreview();
 });
 
 render();
