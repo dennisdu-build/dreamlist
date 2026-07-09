@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>梦想清单 - 可上传版</title>
+    <title>梦想清单 V2</title>
     <style>
 :root {
   color-scheme: light;
@@ -227,6 +227,33 @@ h1 {
   background: #1d2430;
   color: #fff;
   font-weight: 760;
+}
+
+.sync-status {
+  display: inline-grid;
+  min-height: 28px;
+  place-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(29, 36, 48, 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sync-status[data-tone="online"] {
+  background: rgba(13, 124, 102, 0.12);
+  color: #0d6a58;
+}
+
+.sync-status[data-tone="busy"] {
+  background: rgba(13, 93, 133, 0.12);
+  color: var(--accent);
+}
+
+.sync-status[data-tone="error"] {
+  background: rgba(199, 88, 43, 0.12);
+  color: #9d3e19;
 }
 
 .summary {
@@ -1242,6 +1269,7 @@ button[type="submit"],
           </form>
           <div id="userBar" class="user-bar" hidden>
             <span id="currentUserLabel"></span>
+            <span id="syncStatus" class="sync-status">本地模式</span>
             <button id="logoutButton" type="button">切换用户</button>
           </div>
         </div>
@@ -1393,6 +1421,13 @@ button[type="submit"],
     <script>
 const STORAGE_KEY = "dream-community-v1";
 const LEGACY_KEY = "lily-dream-list-v1";
+const CLOUD_TABLE = "dreamlist_app_state";
+const CLOUD_STATE_ID = "dreamlist-v2";
+
+const CLOUD_CONFIG = {
+  supabaseUrl: "",
+  supabaseAnonKey: "",
+};
 
 const defaultCategories = [
   { id: "health", name: "身心健康", color: "#0b66b2" },
@@ -1457,11 +1492,16 @@ const emptyState = {
 let state = loadState();
 let activeFilter = "all";
 let activeView = "mine";
+let cloudReady = false;
+let cloudLoading = false;
+let cloudSaveTimer = null;
+let lastCloudSave = 0;
 
 const loginForm = document.querySelector("#loginForm");
 const loginName = document.querySelector("#loginName");
 const userBar = document.querySelector("#userBar");
 const currentUserLabel = document.querySelector("#currentUserLabel");
+const syncStatus = document.querySelector("#syncStatus");
 const logoutButton = document.querySelector("#logoutButton");
 const controls = document.querySelector("#controls");
 const tabs = document.querySelector("#tabs");
@@ -1626,6 +1666,132 @@ function normalizeMessage(message) {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleCloudSave();
+}
+
+function cloudConfigured() {
+  return Boolean(CLOUD_CONFIG.supabaseUrl && CLOUD_CONFIG.supabaseAnonKey);
+}
+
+function cloudEndpoint(query = "") {
+  return `${CLOUD_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/${CLOUD_TABLE}${query}`;
+}
+
+function cloudHeaders(extra = {}) {
+  return {
+    apikey: CLOUD_CONFIG.supabaseAnonKey,
+    Authorization: `Bearer ${CLOUD_CONFIG.supabaseAnonKey}`,
+    "Content-Type": "application/json",
+    ...extra,
+  };
+}
+
+function setSyncStatus(text, tone = "") {
+  if (!syncStatus) return;
+  syncStatus.textContent = text;
+  syncStatus.dataset.tone = tone;
+}
+
+function normalizeLoadedState(value) {
+  return {
+    currentUserId: state.currentUserId || "",
+    users: Array.isArray(value.users) ? value.users.map(normalizeUser) : [],
+    categories: mergeRecommendedCategories(value.categories),
+    dreams: Array.isArray(value.dreams) ? value.dreams.map(normalizeDream) : [],
+    messages: Array.isArray(value.messages) ? value.messages.map(normalizeMessage) : [],
+  };
+}
+
+function scheduleCloudSave() {
+  if (!cloudConfigured() || !cloudReady || cloudLoading) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(() => {
+    saveCloudState();
+  }, 650);
+}
+
+async function loadCloudState() {
+  if (!cloudConfigured()) {
+    setSyncStatus("本地模式", "local");
+    return;
+  }
+
+  cloudLoading = true;
+  setSyncStatus("同步中", "busy");
+  try {
+    const response = await fetch(cloudEndpoint(`?id=eq.${encodeURIComponent(CLOUD_STATE_ID)}&select=data`), {
+      headers: cloudHeaders(),
+    });
+    if (!response.ok) throw new Error(`读取云端失败：${response.status}`);
+    const rows = await response.json();
+    const cloudState = rows[0]?.data;
+    if (cloudState && Array.isArray(cloudState.users) && Array.isArray(cloudState.dreams)) {
+      state = normalizeLoadedState(cloudState);
+      cloudReady = true;
+      setSyncStatus("在线同步", "online");
+      render();
+      return;
+    }
+
+    cloudReady = true;
+    await saveCloudState(true);
+    setSyncStatus("在线同步", "online");
+  } catch (error) {
+    console.warn(error);
+    cloudReady = false;
+    setSyncStatus("云端未连接", "error");
+  } finally {
+    cloudLoading = false;
+  }
+}
+
+async function saveCloudState(force = false) {
+  if (!cloudConfigured() || (!cloudReady && !force)) return;
+  const savedAt = Date.now();
+  lastCloudSave = savedAt;
+  try {
+    setSyncStatus("保存中", "busy");
+    const response = await fetch(cloudEndpoint("?on_conflict=id"), {
+      method: "POST",
+      headers: cloudHeaders({ Prefer: "resolution=merge-duplicates" }),
+      body: JSON.stringify({
+        id: CLOUD_STATE_ID,
+        data: {
+          users: state.users,
+          categories: state.categories,
+          dreams: state.dreams,
+          messages: state.messages,
+        },
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    if (!response.ok) throw new Error(`保存云端失败：${response.status}`);
+    if (lastCloudSave === savedAt) setSyncStatus("在线同步", "online");
+  } catch (error) {
+    console.warn(error);
+    setSyncStatus("保存失败", "error");
+  }
+}
+
+async function refreshCloudState() {
+  if (!cloudConfigured() || !cloudReady || cloudLoading) return;
+  try {
+    const response = await fetch(cloudEndpoint(`?id=eq.${encodeURIComponent(CLOUD_STATE_ID)}&select=data`), {
+      headers: cloudHeaders(),
+    });
+    if (!response.ok) throw new Error(`刷新云端失败：${response.status}`);
+    const rows = await response.json();
+    const cloudState = rows[0]?.data;
+    if (!cloudState) return;
+    state = normalizeLoadedState({
+      ...cloudState,
+    });
+    setSyncStatus("在线同步", "online");
+    render();
+  } catch (error) {
+    console.warn(error);
+    setSyncStatus("刷新失败", "error");
+  }
 }
 
 function createId(prefix) {
@@ -2725,6 +2891,9 @@ exportModal.addEventListener("click", (event) => {
 });
 
 render();
+loadCloudState();
+window.addEventListener("focus", refreshCloudState);
+setInterval(refreshCloudState, 15000);
 
     </script>
   </body>
