@@ -1702,6 +1702,38 @@ function normalizeLoadedState(value) {
   };
 }
 
+function mergeCloudAndLocalState(cloudValue, localValue = state) {
+  const cloudState = normalizeLoadedState(cloudValue || {});
+  const localState = normalizeLoadedState(localValue || {});
+  return {
+    currentUserId: localState.currentUserId || "",
+    users: mergeById(cloudState.users, localState.users, mergeUser),
+    categories: mergeRecommendedCategories(mergeById(cloudState.categories, localState.categories)),
+    dreams: mergeById(cloudState.dreams, localState.dreams),
+    messages: mergeById(cloudState.messages, localState.messages),
+  };
+}
+
+function mergeById(primary = [], secondary = [], mergeItem = (a, b) => ({ ...a, ...b })) {
+  const map = new Map();
+  primary.forEach((item) => {
+    if (item?.id) map.set(item.id, item);
+  });
+  secondary.forEach((item) => {
+    if (!item?.id) return;
+    map.set(item.id, map.has(item.id) ? mergeItem(map.get(item.id), item) : item);
+  });
+  return [...map.values()];
+}
+
+function mergeUser(existing, incoming) {
+  return {
+    ...existing,
+    ...incoming,
+    following: [...new Set([...(existing.following || []), ...(incoming.following || [])])],
+  };
+}
+
 function scheduleCloudSave() {
   if (!cloudConfigured() || !cloudReady || cloudLoading) return;
   clearTimeout(cloudSaveTimer);
@@ -1726,10 +1758,11 @@ async function loadCloudState() {
     const rows = await response.json();
     const cloudState = rows[0]?.data;
     if (cloudState && Array.isArray(cloudState.users) && Array.isArray(cloudState.dreams)) {
-      state = normalizeLoadedState(cloudState);
+      state = mergeCloudAndLocalState(cloudState);
       cloudReady = true;
       setSyncStatus("在线同步", "online");
       render();
+      await saveCloudState(true);
       return;
     }
 
@@ -1783,9 +1816,7 @@ async function refreshCloudState() {
     const rows = await response.json();
     const cloudState = rows[0]?.data;
     if (!cloudState) return;
-    state = normalizeLoadedState({
-      ...cloudState,
-    });
+    state = mergeCloudAndLocalState(cloudState);
     setSyncStatus("在线同步", "online");
     render();
   } catch (error) {
