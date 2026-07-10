@@ -1,0 +1,3016 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>梦想清单 V2</title>
+    <style>
+:root {
+  color-scheme: light;
+  --ink: #1d2430;
+  --muted: #6d7280;
+  --line: rgba(37, 43, 55, 0.12);
+  --paper: #f4f6f4;
+  --panel: rgba(255, 255, 255, 0.88);
+  --accent: #0d5d85;
+  --warm: #c7582b;
+  --shadow: 0 28px 80px rgba(26, 34, 44, 0.14);
+  --soft-shadow: 0 14px 36px rgba(26, 34, 44, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(29, 36, 48, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(29, 36, 48, 0.028) 1px, transparent 1px),
+    linear-gradient(128deg, #f8faf8 0%, #edf4f1 34%, #f5f1e8 67%, #eef2f7 100%);
+  background-size: 48px 48px, 48px 48px, cover;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(112deg, transparent 0 21%, rgba(13, 93, 133, 0.08) 21.2% 21.6%, transparent 21.8% 100%),
+    linear-gradient(112deg, transparent 0 45%, rgba(199, 88, 43, 0.07) 45.1% 45.45%, transparent 45.65% 100%),
+    linear-gradient(112deg, transparent 0 73%, rgba(29, 36, 48, 0.055) 73.1% 73.35%, transparent 73.55% 100%),
+    repeating-linear-gradient(112deg, rgba(29, 36, 48, 0.025) 0 1px, transparent 1px 18px);
+  opacity: 0.74;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(244, 246, 244, 0.12)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.42), transparent 30%, rgba(255, 255, 255, 0.24)),
+    linear-gradient(145deg, rgba(13, 93, 133, 0.06), transparent 38%, rgba(199, 88, 43, 0.055));
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 34px 0 48px;
+}
+
+.hero {
+  min-height: clamp(390px, 44vw, 540px);
+  display: grid;
+  align-items: center;
+  padding: clamp(34px, 5vw, 72px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-top-color: rgba(255, 255, 255, 0.94);
+  background:
+    linear-gradient(104deg, rgba(255, 255, 255, 0.96) 0 56%, rgba(255, 255, 255, 0.68) 56% 100%),
+    linear-gradient(132deg, rgba(13, 93, 133, 0.12), transparent 34%, rgba(199, 88, 43, 0.1));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "Dream";
+  position: absolute;
+  right: clamp(22px, 5vw, 72px);
+  bottom: clamp(18px, 4vw, 52px);
+  color: rgba(13, 93, 133, 0.055);
+  font-size: clamp(80px, 14vw, 190px);
+  font-weight: 900;
+  line-height: 0.8;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto clamp(28px, 5vw, 72px) clamp(24px, 4vw, 52px) auto;
+  width: min(36vw, 360px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(13, 93, 133, 0.42), rgba(199, 88, 43, 0.36));
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--warm);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(46px, 7vw, 92px);
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  max-width: 620px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.manifesto-label {
+  display: inline-flex;
+  margin-top: 28px;
+  padding: 5px 10px;
+  border: 1px solid rgba(199, 88, 43, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 246, 239, 0.72);
+  color: var(--warm);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.manifesto {
+  max-width: 700px;
+  margin-top: 12px;
+  padding-left: 18px;
+  border-left: 3px solid rgba(199, 88, 43, 0.48);
+  color: #2f3947;
+  font-size: clamp(17px, 1.45vw, 20px);
+  line-height: 1.82;
+  font-weight: 650;
+}
+
+.owner-form {
+  display: inline-grid;
+  grid-template-columns: auto minmax(120px, 180px) auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 8px;
+  border: 1px solid rgba(37, 43, 55, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.owner-form label {
+  padding-left: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.owner-form input {
+  min-height: 36px;
+}
+
+.owner-form button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #1d2430;
+  color: #fff;
+  font-weight: 760;
+}
+
+.user-bar {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 9px 10px;
+  border: 1px solid rgba(37, 43, 55, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.user-bar button {
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #1d2430;
+  color: #fff;
+  font-weight: 760;
+}
+
+.sync-status {
+  display: inline-grid;
+  min-height: 28px;
+  place-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(29, 36, 48, 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sync-status[data-tone="online"] {
+  background: rgba(13, 124, 102, 0.12);
+  color: #0d6a58;
+}
+
+.sync-status[data-tone="busy"] {
+  background: rgba(13, 93, 133, 0.12);
+  color: var(--accent);
+}
+
+.sync-status[data-tone="error"] {
+  background: rgba(199, 88, 43, 0.12);
+  color: #9d3e19;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 8px;
+  background: rgba(37, 43, 55, 0.08);
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.summary div {
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.summary span {
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.summary small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.tab {
+  min-height: 42px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  font-weight: 760;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #1d2430, #0d5d85);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(13, 93, 133, 0.2);
+}
+
+.add-form,
+.category-form {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 8px;
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.add-form {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 220px) auto;
+}
+
+.category-form {
+  grid-template-columns: minmax(0, 1fr) 48px auto;
+}
+
+input,
+select {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid rgba(37, 43, 55, 0.14);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  padding: 0 12px;
+  border-radius: 6px;
+}
+
+input[type="color"] {
+  padding: 4px;
+}
+
+button[type="submit"],
+.ghost {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 6px;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.category-form button {
+  background: var(--warm);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.sidebar,
+.list-panel {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  border-radius: 8px;
+}
+
+.sidebar {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 14px;
+}
+
+.filter {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--ink);
+  text-align: left;
+  font-weight: 700;
+}
+
+.filter.active {
+  background: linear-gradient(135deg, #1d2430, #0d5d85);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(13, 93, 133, 0.2);
+}
+
+.category-filters {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.category-filter {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.list-panel {
+  min-height: 520px;
+}
+
+.view[hidden],
+[hidden] {
+  display: none !important;
+}
+
+.panel-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-head h2 {
+  font-size: 22px;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.ghost {
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.primary-lite {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1d2430, #0d5d85);
+  color: #fff;
+  font-weight: 760;
+  white-space: nowrap;
+  box-shadow: 0 10px 22px rgba(13, 93, 133, 0.18);
+}
+
+.dream-list {
+  display: grid;
+  gap: 10px;
+  padding: 20px 22px 24px;
+}
+
+.category-section {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr);
+  gap: 8px 18px;
+  align-items: start;
+  padding: 14px 0 18px;
+  border-top: 1px solid rgba(37, 43, 55, 0.08);
+}
+
+.category-section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.category-section-head {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 8px;
+  align-items: start;
+  padding: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.category-section-head .dream-category {
+  justify-self: start;
+  font-size: 15px;
+  padding: 7px 12px;
+}
+
+.category-dreams {
+  display: grid;
+  gap: 10px;
+}
+
+.status-group {
+  grid-column: 2;
+  display: grid;
+  gap: 8px;
+}
+
+.status-group:empty {
+  display: none;
+}
+
+.status-group-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.status-group-head span {
+  color: var(--ink);
+}
+
+.status-group-head small {
+  min-width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(29, 36, 48, 0.08);
+  color: var(--muted);
+}
+
+.dream-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border: 1px solid rgba(37, 43, 55, 0.12);
+  border-left: 4px solid rgba(13, 93, 133, 0.34);
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(49, 39, 29, 0.06);
+}
+
+.personal-dream-item {
+  padding-top: 13px;
+}
+
+.check-wrap {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin-top: 1px;
+}
+
+.dream-check {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-check {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #8d91a0;
+  background: #fff;
+}
+
+.dream-check:checked + .custom-check::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 9px;
+  margin: 6px 0 0 5px;
+  border-left: 4px solid #ff1c18;
+  border-bottom: 4px solid #ff1c18;
+  transform: rotate(-45deg);
+}
+
+.dream-main {
+  display: grid;
+  gap: 8px;
+}
+
+.dream-title {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 17px;
+  line-height: 1.45;
+  background: transparent;
+}
+
+.dream-item.done .dream-title {
+  color: #777;
+  text-decoration: line-through;
+}
+
+.dream-category {
+  justify-self: start;
+  max-width: 100%;
+  padding: 5px 10px;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.share-row,
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.share-row label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.share-row input {
+  width: auto;
+  min-height: auto;
+}
+
+.share-row select {
+  width: min(180px, 100%);
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+.share-row button,
+.social-actions button,
+.comment-form button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: rgba(29, 36, 48, 0.88);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.share-row button:disabled,
+.social-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.dream-item.readonly {
+  grid-template-columns: 18px minmax(0, 1fr);
+}
+
+.readonly-title {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.status-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #c7582b;
+  background: #fff;
+}
+
+.status-dot.complete {
+  border-color: #0d7c66;
+  background: #0d7c66;
+}
+
+.social-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.social-actions select {
+  width: min(190px, 100%);
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+.like-btn {
+  background: #fff0e8 !important;
+  color: #8b3f1f !important;
+}
+
+.follow-btn {
+  background: #e9f4f1 !important;
+  color: #0d5d50 !important;
+}
+
+.comments {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(37, 43, 55, 0.09);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.comment,
+.comment-empty {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.comment strong {
+  color: var(--ink);
+}
+
+.comment-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.comment-form input {
+  min-height: 36px;
+}
+
+.private-message-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(13, 93, 133, 0.12);
+  border-radius: 8px;
+  background: rgba(233, 244, 241, 0.58);
+}
+
+.private-message-form input {
+  min-height: 36px;
+}
+
+.private-message-form button {
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #0d5d50;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.private-message-form button:disabled,
+.private-message-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.private-message-form small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.inbox-section-title {
+  margin: 6px 0 -4px;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.friend-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.message-people-section {
+  display: grid;
+  gap: 12px;
+}
+
+.message-people-head {
+  display: grid;
+  gap: 4px;
+  padding: 0 4px;
+}
+
+.message-people-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.message-people-head span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.message-people-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.friend-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(37, 43, 55, 0.1);
+  border-left: 4px solid #0d5d50;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 26px rgba(49, 39, 29, 0.05);
+}
+
+.friend-card-main {
+  display: grid;
+  gap: 5px;
+}
+
+.friend-card-main strong {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.friend-card-main span,
+.friend-card-main small {
+  color: var(--muted);
+  font-weight: 680;
+}
+
+.friend-action {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 6px;
+  background: #0d5d50;
+  color: #fff;
+  font-weight: 760;
+}
+
+.friend-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.friend-group {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(37, 43, 55, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.friend-group strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.friend-group div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.friend-group span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(13, 93, 133, 0.1);
+  color: #0d5d50;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.message-list {
+  display: grid;
+  gap: 10px;
+}
+
+.message-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid rgba(37, 43, 55, 0.1);
+  border-left: 4px solid #0d5d50;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 26px rgba(49, 39, 29, 0.05);
+}
+
+.message-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.message-meta strong {
+  color: var(--ink);
+}
+
+.message-item p {
+  color: #3f4856;
+  line-height: 1.55;
+}
+
+.celebration-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  width: min(420px, calc(100vw - 32px));
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-left: 5px solid #0d7c66;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 248, 0.9)),
+    linear-gradient(90deg, rgba(13, 124, 102, 0.08), rgba(240, 214, 21, 0.08));
+  box-shadow: 0 22px 60px rgba(26, 34, 44, 0.18);
+  color: var(--ink);
+  transform: translateY(18px);
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+  backdrop-filter: blur(18px);
+}
+
+.celebration-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.celebration-toast strong {
+  font-size: 17px;
+}
+
+.celebration-toast span {
+  color: #3f4856;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.export-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(29, 36, 48, 0.44);
+  backdrop-filter: blur(12px);
+}
+
+.export-dialog {
+  width: min(1060px, 100%);
+  max-height: min(92vh, 980px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background: rgba(248, 250, 248, 0.96);
+  box-shadow: 0 32px 90px rgba(12, 18, 28, 0.3);
+}
+
+.export-head,
+.export-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.export-head p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.export-canvas-wrap {
+  overflow: auto;
+  padding: 18px;
+  background:
+    linear-gradient(90deg, rgba(29, 36, 48, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(29, 36, 48, 0.035) 1px, transparent 1px),
+    #edf2ef;
+  background-size: 30px 30px;
+}
+
+.export-canvas-wrap canvas {
+  display: block;
+  width: min(100%, 720px);
+  height: auto;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 18px 54px rgba(24, 32, 42, 0.18);
+}
+
+.export-actions {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.export-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 760;
+}
+
+.stats-panel {
+  margin-top: 18px;
+  min-height: 520px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+.stat-card {
+  display: grid;
+  gap: 6px;
+  min-height: 86px;
+  align-content: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--soft-shadow);
+}
+
+.stat-card strong {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.stat-card span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.bar-chart {
+  display: grid;
+  gap: 14px;
+  padding: 0 18px 18px;
+}
+
+.bar-row {
+  display: grid;
+  gap: 8px;
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.bar-label strong {
+  color: var(--ink);
+}
+
+.bar-track {
+  display: flex;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(37, 43, 55, 0.1);
+}
+
+.bar-done {
+  background: #0d7c66;
+}
+
+.bar-open {
+  background: #d9893d;
+}
+
+.delete-btn {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 6px;
+  color: #8b1a1a;
+  background: #fff1ed;
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: 46px 18px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 820px) {
+  .controls,
+  .board {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell {
+    width: min(100% - 28px, 720px);
+  }
+
+  .sidebar,
+  .category-section-head {
+    position: static;
+    max-height: none;
+  }
+
+  .dream-list {
+    padding: 16px;
+  }
+
+  .category-section {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .status-group {
+    grid-column: 1;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 30px 24px 34px;
+  }
+
+  .hero::before {
+    font-size: 82px;
+    right: 18px;
+    bottom: 22px;
+  }
+
+  .hero::after {
+    width: 180px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 14vw, 68px);
+  }
+
+  .manifesto {
+    padding-left: 14px;
+    font-size: 16px;
+    line-height: 1.72;
+  }
+
+  .tabs,
+  .summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .add-form,
+  .category-form,
+  .owner-form {
+    grid-template-columns: 1fr;
+  }
+
+  .dream-item {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .friend-card {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-btn {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .comment-form {
+    grid-template-columns: 1fr;
+  }
+
+  .private-message-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Dream list</p>
+          <h1 id="pageTitle">梦想清单</h1>
+          <p class="manifesto-label">Lily 写给你的话</p>
+          <p class="manifesto">曾经，在我人生最低落、最充满内耗的时候，我手写下了自己的第一份梦想清单。也许冥冥之中真的有一种奇妙的牵引力，那些落在纸上的字句，竟然都在岁月里慢慢长成了现实。每一个梦想，都像一束光，不仅治愈了曾经的迷茫，也照亮了我一路走来的方向。你也愿意写下自己的梦想吗？也许，写着写着，那些光就真的照进了现实。</p>
+          <p id="subtitle" class="subtitle">登录后写下自己的梦想，也可以把愿望分享到分享大厅。</p>
+          <form id="loginForm" class="owner-form">
+            <label for="loginName">用户名</label>
+            <input id="loginName" type="text" placeholder="输入你的名字" autocomplete="name" required />
+            <button type="submit">登录</button>
+          </form>
+          <div id="userBar" class="user-bar" hidden>
+            <span id="currentUserLabel"></span>
+            <span id="syncStatus" class="sync-status">本地模式</span>
+            <button id="logoutButton" type="button">切换用户</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="整体进度">
+        <div>
+          <span id="userCount">0</span>
+          <small>参与人数</small>
+        </div>
+        <div>
+          <span id="doneCount">0</span>
+          <small>已完成</small>
+        </div>
+        <div>
+          <span id="totalCount">0</span>
+          <small>全部梦想</small>
+        </div>
+        <div>
+          <span id="progressText">0%</span>
+          <small>完成度</small>
+        </div>
+      </section>
+
+      <nav id="tabs" class="tabs" aria-label="页面视图" hidden>
+        <button class="tab active" type="button" data-view="mine">我的梦想</button>
+        <button class="tab" type="button" data-view="all">所有人的梦想</button>
+        <button class="tab" type="button" data-view="hall">分享大厅</button>
+        <button class="tab" type="button" data-view="messages">消息</button>
+        <button class="tab" type="button" data-view="inbox">个人分享</button>
+        <button class="tab" type="button" data-view="stats">统计</button>
+      </nav>
+
+      <section id="controls" class="controls" aria-label="梦想操作区" hidden>
+        <form id="dreamForm" class="add-form">
+          <input id="dreamInput" type="text" placeholder="写下一个新的梦想" autocomplete="off" required />
+          <select id="categorySelect" aria-label="选择梦想类目"></select>
+          <button type="submit">增加梦想</button>
+        </form>
+
+        <form id="categoryForm" class="category-form">
+          <input id="categoryInput" type="text" placeholder="新增自定义类目" autocomplete="off" required />
+          <input id="categoryColor" type="color" value="#0b5f9e" aria-label="选择类目颜色" />
+          <button type="submit">增加自定义类目</button>
+        </form>
+      </section>
+
+      <section id="mineView" class="board view">
+        <aside class="sidebar" aria-label="类目筛选">
+          <button class="filter active" type="button" data-filter="all">全部</button>
+          <button class="filter" type="button" data-filter="open">未完成</button>
+          <button class="filter" type="button" data-filter="done">已完成</button>
+          <div id="categoryFilters" class="category-filters"></div>
+        </aside>
+
+        <section class="list-panel">
+          <div class="panel-head">
+            <h2 id="viewTitle">全部梦想</h2>
+            <div class="panel-actions">
+              <button id="exportPoster" class="primary-lite" type="button">预览/下载清单</button>
+              <button id="resetDemo" class="ghost" type="button">恢复我的初始清单</button>
+            </div>
+          </div>
+          <div id="dreamList" class="dream-list" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <section id="allView" class="list-panel view" hidden>
+        <div class="panel-head">
+          <h2>所有人的梦想及实现情况</h2>
+        </div>
+        <div id="allDreamList" class="dream-list"></div>
+      </section>
+
+      <section id="hallView" class="list-panel view" hidden>
+        <div class="panel-head">
+          <h2>分享大厅</h2>
+        </div>
+        <div id="sharedDreamList" class="dream-list"></div>
+      </section>
+
+      <section id="inboxView" class="list-panel view" hidden>
+        <div class="panel-head">
+          <h2>个人分享</h2>
+        </div>
+        <div id="inboxDreamList" class="dream-list"></div>
+      </section>
+
+      <section id="messagesView" class="list-panel view" hidden>
+        <div class="panel-head">
+          <h2>消息</h2>
+        </div>
+        <div id="messagePeopleList" class="dream-list"></div>
+      </section>
+
+      <section id="statsView" class="stats-panel view" hidden>
+        <div class="panel-head">
+          <h2>整体统计</h2>
+        </div>
+        <div id="statCards" class="stat-cards"></div>
+        <div id="userBars" class="bar-chart"></div>
+      </section>
+    </main>
+
+    <div id="celebrationToast" class="celebration-toast" role="status" aria-live="polite" hidden>
+      <strong id="celebrationTitle"></strong>
+      <span id="celebrationText"></span>
+    </div>
+
+    <div id="exportModal" class="export-modal" hidden>
+      <div class="export-dialog" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <div class="export-head">
+          <div>
+            <h2 id="exportTitle">梦想清单预览</h2>
+            <p>这是一张自动整理好的单页清单，可以直接下载分享。</p>
+          </div>
+          <button id="closeExport" class="ghost" type="button">关闭</button>
+        </div>
+        <div class="export-canvas-wrap">
+          <canvas id="exportCanvas" width="1200" height="1800"></canvas>
+        </div>
+        <div class="export-actions">
+          <button id="downloadPoster" type="button">下载 PNG</button>
+          <button id="printPoster" class="ghost" type="button">打印/保存 PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <template id="dreamTemplate">
+      <article class="dream-item">
+        <label class="check-wrap">
+          <input class="dream-check" type="checkbox" />
+          <span class="custom-check" aria-hidden="true"></span>
+        </label>
+        <div class="dream-main">
+          <input class="dream-title" type="text" />
+          <span class="dream-category"></span>
+          <div class="share-row">
+            <label><input class="share-check" type="checkbox" /> 分享到大厅</label>
+            <label><input class="name-check" type="checkbox" /> 实名分享</label>
+            <select class="personal-share-select" aria-label="选择个人分享对象"></select>
+            <button class="personal-share-btn" type="button">分享给个人</button>
+          </div>
+        </div>
+        <button class="delete-btn" type="button" aria-label="删除梦想">删除</button>
+      </article>
+    </template>
+
+    <script>
+const STORAGE_KEY = "dream-community-v1";
+const LEGACY_KEY = "lily-dream-list-v1";
+const CLOUD_TABLE = "dreamlist_app_state";
+const CLOUD_STATE_ID = "dreamlist-v2";
+
+const CLOUD_CONFIG = {
+  supabaseUrl: "",
+  supabaseAnonKey: "",
+};
+
+const defaultCategories = [
+  { id: "health", name: "身心健康", color: "#0b66b2" },
+  { id: "family", name: "关系与家庭", color: "#a7cf00" },
+  { id: "career", name: "事业与财富", color: "#f25c1b" },
+  { id: "learning", name: "能力与学习", color: "#f0d615" },
+  { id: "lifestyle", name: "生活方式与居住", color: "#9a6a43" },
+  { id: "travel", name: "旅行与体验", color: "#4a90a4" },
+  { id: "creation", name: "创造与表达", color: "#8b5fbf" },
+  { id: "warm", name: "贡献与影响", color: "#00475d" },
+];
+
+const lilyDreams = [
+  { title: "去日本看闺蜜", categoryId: "travel", done: false },
+  { title: "帮忙别人完成梦想", categoryId: "warm", done: true },
+  { title: "换一份自己可以相对掌控时间的自己热爱的工作/事业", categoryId: "career", done: true },
+  { title: "有一个有落地窗的大房子，练瑜伽，喝茶，看书", categoryId: "lifestyle", done: false },
+  { title: "读MBA", categoryId: "learning", done: true },
+  { title: "思想旅行家读书会100期", categoryId: "learning", done: true },
+  { title: "带爸妈去趟北京,坐飞机", categoryId: "family", done: true },
+  { title: "写一本书留给小石头", categoryId: "creation", done: false },
+  { title: "带小石头去迪士尼", categoryId: "travel", done: true },
+  { title: "看张学友的演唱会", categoryId: "travel", done: true },
+  { title: "跑一次马拉松（半马）", categoryId: "health", done: true },
+  { title: "戈壁敦煌徒步", categoryId: "health", done: true },
+  { title: "去西藏", categoryId: "travel", done: false },
+  { title: "看北极光", categoryId: "travel", done: false },
+];
+
+const initialDreamCategoryMap = new Map(lilyDreams.map((dream) => [dream.title, dream.categoryId]));
+const initialDreamOrderMap = new Map(lilyDreams.map((dream, index) => [dream.title, index]));
+
+const categoryAliasMap = new Map([
+  ["self", "lifestyle"],
+  ["自我实现", "lifestyle"],
+  ["健康与身心", "health"],
+  ["家庭与关系", "family"],
+  ["学习与成长", "learning"],
+  ["创造与作品", "creation"],
+  ["影响他人/公益", "warm"],
+]);
+
+const celebrationMessages = [
+  "你真的做到了。这个勾，不只是完成一件事，也是你认真走过的一段路。",
+  "恭喜你，把一个曾经写下的愿望，变成了真实发生的人生。",
+  "这一刻值得被记住。愿这个完成，成为你继续相信自己的证据。",
+  "太好了。梦想被完成的时候，那个曾经努力的你，也被温柔地回应了。",
+  "又有一束光亮起来了。谢谢你没有放弃那个写下梦想的自己。",
+  "这不是一个简单的勾选，这是你和未来之间的一次漂亮抵达。",
+  "恭喜完成。愿你带着这份笃定，继续去实现更大的远方。",
+  "你把愿望照进了现实。请认真为自己骄傲一次。",
+];
+
+const emptyState = {
+  currentUserId: "",
+  users: [],
+  categories: structuredClone(defaultCategories),
+  dreams: [],
+  messages: [],
+};
+
+let state = loadState();
+let activeFilter = "all";
+let activeView = "mine";
+let cloudReady = false;
+let cloudLoading = false;
+let cloudSaveTimer = null;
+let lastCloudSave = 0;
+
+const loginForm = document.querySelector("#loginForm");
+const loginName = document.querySelector("#loginName");
+const userBar = document.querySelector("#userBar");
+const currentUserLabel = document.querySelector("#currentUserLabel");
+const syncStatus = document.querySelector("#syncStatus");
+const logoutButton = document.querySelector("#logoutButton");
+const controls = document.querySelector("#controls");
+const tabs = document.querySelector("#tabs");
+const dreamForm = document.querySelector("#dreamForm");
+const categoryForm = document.querySelector("#categoryForm");
+const dreamInput = document.querySelector("#dreamInput");
+const categoryInput = document.querySelector("#categoryInput");
+const categoryColor = document.querySelector("#categoryColor");
+const categorySelect = document.querySelector("#categorySelect");
+const categoryFilters = document.querySelector("#categoryFilters");
+const dreamList = document.querySelector("#dreamList");
+const allDreamList = document.querySelector("#allDreamList");
+const sharedDreamList = document.querySelector("#sharedDreamList");
+const inboxDreamList = document.querySelector("#inboxDreamList");
+const messagePeopleList = document.querySelector("#messagePeopleList");
+const statCards = document.querySelector("#statCards");
+const userBars = document.querySelector("#userBars");
+const template = document.querySelector("#dreamTemplate");
+const viewTitle = document.querySelector("#viewTitle");
+const pageTitle = document.querySelector("#pageTitle");
+const subtitle = document.querySelector("#subtitle");
+const celebrationToast = document.querySelector("#celebrationToast");
+const celebrationTitle = document.querySelector("#celebrationTitle");
+const celebrationText = document.querySelector("#celebrationText");
+const exportPosterButton = document.querySelector("#exportPoster");
+const exportModal = document.querySelector("#exportModal");
+const closeExportButton = document.querySelector("#closeExport");
+const downloadPosterButton = document.querySelector("#downloadPoster");
+const printPosterButton = document.querySelector("#printPoster");
+const exportCanvas = document.querySelector("#exportCanvas");
+let celebrationTimer = null;
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed.users) && Array.isArray(parsed.dreams)) {
+        return {
+          currentUserId: parsed.currentUserId || "",
+          users: parsed.users.map(normalizeUser),
+          categories: mergeRecommendedCategories(parsed.categories),
+          dreams: parsed.dreams.map(normalizeDream),
+          messages: Array.isArray(parsed.messages) ? parsed.messages.map(normalizeMessage) : [],
+        };
+      }
+    } catch {
+      return structuredClone(emptyState);
+    }
+  }
+
+  const legacy = migrateLegacyState();
+  if (legacy) return legacy;
+  return structuredClone(emptyState);
+}
+
+function migrateLegacyState() {
+  const legacySaved = localStorage.getItem(LEGACY_KEY);
+  if (!legacySaved) return null;
+
+  try {
+    const legacy = JSON.parse(legacySaved);
+    const ownerName = legacy.ownerName || "Lily";
+    const user = normalizeUser({ id: createId("user"), name: ownerName });
+    const categories = mergeRecommendedCategories(legacy.categories);
+    const dreams = Array.isArray(legacy.dreams) ? legacy.dreams : lilyDreams;
+    return {
+      currentUserId: user.id,
+      users: [user],
+      categories,
+      dreams: dreams.map((dream) =>
+        normalizeDream({
+          ...dream,
+          id: dream.id || createId("dream"),
+          userId: user.id,
+          shared: false,
+          showName: true,
+        }),
+      ),
+      messages: [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function mergeRecommendedCategories(categories = []) {
+  const existing = Array.isArray(categories) ? categories : [];
+  const normalizedExisting = existing.map((category) => ({
+    ...category,
+    id: normalizeCategoryId(category.id || category.name),
+  }));
+  const categoryMap = new Map(
+    normalizedExisting.map((category) => [category.id, category]),
+  );
+  const recommended = defaultCategories.map((category) => ({
+    ...categoryMap.get(category.id),
+    ...category,
+    recommended: true,
+  }));
+  const custom = normalizedExisting
+    .filter((category) => !defaultCategories.some((item) => item.id === category.id))
+    .filter((category, index, list) => list.findIndex((item) => item.id === category.id) === index);
+  return recommended.concat(custom);
+}
+
+function normalizeDream(dream) {
+  const categoryId = normalizeCategoryId(
+    initialDreamCategoryMap.get(dream.title) || dream.categoryId || defaultCategories[0].id,
+  );
+  const initialOrder = initialDreamOrderMap.get(dream.title) || 0;
+  const createdAt = dream.createdAt || Date.now();
+  const completedAt = Boolean(dream.done) ? dream.completedAt || createdAt + initialOrder : null;
+  const firstCompletedAt = dream.firstCompletedAt || completedAt;
+  return {
+    id: dream.id || createId("dream"),
+    userId: dream.userId || "",
+    title: dream.title || "",
+    categoryId,
+    done: Boolean(dream.done),
+    completedAt,
+    firstCompletedAt,
+    shared: Boolean(dream.shared),
+    showName: dream.showName !== false,
+    sharedWith: Array.isArray(dream.sharedWith) ? dream.sharedWith : [],
+    likedBy: Array.isArray(dream.likedBy) ? dream.likedBy : [],
+    comments: Array.isArray(dream.comments) ? dream.comments.map(normalizeComment) : [],
+    createdAt,
+  };
+}
+
+function normalizeCategoryId(categoryId) {
+  return categoryAliasMap.get(categoryId) || categoryId;
+}
+
+function normalizeUser(user) {
+  return {
+    id: user.id || createId("user"),
+    name: user.name || "未命名",
+    following: Array.isArray(user.following) ? user.following : [],
+  };
+}
+
+function normalizeComment(comment) {
+  return {
+    id: comment.id || createId("comment"),
+    userId: comment.userId || "",
+    text: comment.text || "",
+    createdAt: comment.createdAt || Date.now(),
+  };
+}
+
+function normalizeMessage(message) {
+  return {
+    id: message.id || createId("message"),
+    fromUserId: message.fromUserId || "",
+    toUserId: message.toUserId || "",
+    text: message.text || "",
+    createdAt: message.createdAt || Date.now(),
+  };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleCloudSave();
+}
+
+function cloudConfigured() {
+  return Boolean(CLOUD_CONFIG.supabaseUrl && CLOUD_CONFIG.supabaseAnonKey);
+}
+
+function cloudEndpoint(query = "") {
+  return `${CLOUD_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/${CLOUD_TABLE}${query}`;
+}
+
+function cloudHeaders(extra = {}) {
+  return {
+    apikey: CLOUD_CONFIG.supabaseAnonKey,
+    Authorization: `Bearer ${CLOUD_CONFIG.supabaseAnonKey}`,
+    "Content-Type": "application/json",
+    ...extra,
+  };
+}
+
+function setSyncStatus(text, tone = "") {
+  if (!syncStatus) return;
+  syncStatus.textContent = text;
+  syncStatus.dataset.tone = tone;
+}
+
+function normalizeLoadedState(value) {
+  return {
+    currentUserId: state.currentUserId || "",
+    users: Array.isArray(value.users) ? value.users.map(normalizeUser) : [],
+    categories: mergeRecommendedCategories(value.categories),
+    dreams: Array.isArray(value.dreams) ? value.dreams.map(normalizeDream) : [],
+    messages: Array.isArray(value.messages) ? value.messages.map(normalizeMessage) : [],
+  };
+}
+
+function mergeCloudAndLocalState(cloudValue, localValue = state) {
+  const cloudState = normalizeLoadedState(cloudValue || {});
+  const localState = normalizeLoadedState(localValue || {});
+  return {
+    currentUserId: localState.currentUserId || "",
+    users: mergeById(cloudState.users, localState.users, mergeUser),
+    categories: mergeRecommendedCategories(mergeById(cloudState.categories, localState.categories)),
+    dreams: mergeById(cloudState.dreams, localState.dreams),
+    messages: mergeById(cloudState.messages, localState.messages),
+  };
+}
+
+function mergeById(primary = [], secondary = [], mergeItem = (a, b) => ({ ...a, ...b })) {
+  const map = new Map();
+  primary.forEach((item) => {
+    if (item?.id) map.set(item.id, item);
+  });
+  secondary.forEach((item) => {
+    if (!item?.id) return;
+    map.set(item.id, map.has(item.id) ? mergeItem(map.get(item.id), item) : item);
+  });
+  return [...map.values()];
+}
+
+function mergeUser(existing, incoming) {
+  return {
+    ...existing,
+    ...incoming,
+    following: [...new Set([...(existing.following || []), ...(incoming.following || [])])],
+  };
+}
+
+function scheduleCloudSave() {
+  if (!cloudConfigured() || !cloudReady || cloudLoading) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(() => {
+    saveCloudState();
+  }, 650);
+}
+
+async function loadCloudState() {
+  if (!cloudConfigured()) {
+    setSyncStatus("本地模式", "local");
+    return;
+  }
+
+  cloudLoading = true;
+  setSyncStatus("同步中", "busy");
+  try {
+    const response = await fetch(cloudEndpoint(`?id=eq.${encodeURIComponent(CLOUD_STATE_ID)}&select=data`), {
+      headers: cloudHeaders(),
+    });
+    if (!response.ok) throw new Error(`读取云端失败：${response.status}`);
+    const rows = await response.json();
+    const cloudState = rows[0]?.data;
+    if (cloudState && Array.isArray(cloudState.users) && Array.isArray(cloudState.dreams)) {
+      state = mergeCloudAndLocalState(cloudState);
+      cloudReady = true;
+      setSyncStatus("在线同步", "online");
+      render();
+      await saveCloudState(true);
+      return;
+    }
+
+    cloudReady = true;
+    await saveCloudState(true);
+    setSyncStatus("在线同步", "online");
+  } catch (error) {
+    console.warn(error);
+    cloudReady = false;
+    setSyncStatus("云端未连接", "error");
+  } finally {
+    cloudLoading = false;
+  }
+}
+
+async function saveCloudState(force = false) {
+  if (!cloudConfigured() || (!cloudReady && !force)) return;
+  const savedAt = Date.now();
+  lastCloudSave = savedAt;
+  try {
+    setSyncStatus("保存中", "busy");
+    const response = await fetch(cloudEndpoint("?on_conflict=id"), {
+      method: "POST",
+      headers: cloudHeaders({ Prefer: "resolution=merge-duplicates" }),
+      body: JSON.stringify({
+        id: CLOUD_STATE_ID,
+        data: {
+          users: state.users,
+          categories: state.categories,
+          dreams: state.dreams,
+          messages: state.messages,
+        },
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    if (!response.ok) throw new Error(`保存云端失败：${response.status}`);
+    if (lastCloudSave === savedAt) setSyncStatus("在线同步", "online");
+  } catch (error) {
+    console.warn(error);
+    setSyncStatus("保存失败", "error");
+  }
+}
+
+async function refreshCloudState() {
+  if (!cloudConfigured() || !cloudReady || cloudLoading) return;
+  try {
+    const response = await fetch(cloudEndpoint(`?id=eq.${encodeURIComponent(CLOUD_STATE_ID)}&select=data`), {
+      headers: cloudHeaders(),
+    });
+    if (!response.ok) throw new Error(`刷新云端失败：${response.status}`);
+    const rows = await response.json();
+    const cloudState = rows[0]?.data;
+    if (!cloudState) return;
+    state = mergeCloudAndLocalState(cloudState);
+    setSyncStatus("在线同步", "online");
+    render();
+  } catch (error) {
+    console.warn(error);
+    setSyncStatus("刷新失败", "error");
+  }
+}
+
+function createId(prefix) {
+  if (crypto.randomUUID) return `${prefix}-${crypto.randomUUID()}`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function showCelebration(dreamTitle) {
+  const message = celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)];
+  celebrationTitle.textContent = "梦想完成了";
+  celebrationText.textContent = `「${dreamTitle}」${message}`;
+  celebrationToast.hidden = false;
+  celebrationToast.classList.remove("show");
+  window.requestAnimationFrame(() => {
+    celebrationToast.classList.add("show");
+  });
+
+  clearTimeout(celebrationTimer);
+  celebrationTimer = setTimeout(() => {
+    celebrationToast.classList.remove("show");
+    setTimeout(() => {
+      celebrationToast.hidden = true;
+    }, 260);
+  }, 5200);
+}
+
+function currentUser() {
+  return state.users.find((user) => user.id === state.currentUserId) || null;
+}
+
+function userName(userId) {
+  return state.users.find((user) => user.id === userId)?.name || "未知用户";
+}
+
+function otherUsers() {
+  const user = currentUser();
+  if (!user) return [];
+  return state.users.filter((item) => item.id !== user.id);
+}
+
+function isFollowing(userId) {
+  const user = currentUser();
+  return Boolean(user?.following.includes(userId));
+}
+
+function areFriends(userId) {
+  const user = currentUser();
+  const other = state.users.find((item) => item.id === userId);
+  if (!user || !other) return false;
+  return user.following.includes(userId) && other.following.includes(user.id);
+}
+
+function messagesBetween(userIdA, userIdB) {
+  return state.messages
+    .filter(
+      (message) =>
+        (message.fromUserId === userIdA && message.toUserId === userIdB) ||
+        (message.fromUserId === userIdB && message.toUserId === userIdA),
+    )
+    .sort((a, b) => a.createdAt - b.createdAt);
+}
+
+function sentMessageCount(fromUserId, toUserId) {
+  return state.messages.filter((message) => message.fromUserId === fromUserId && message.toUserId === toUserId).length;
+}
+
+function canSendPrivateMessage(toUserId) {
+  const user = currentUser();
+  if (!user || user.id === toUserId) return false;
+  if (areFriends(toUserId)) return true;
+  return sentMessageCount(user.id, toUserId) < 1;
+}
+
+function privateMessageHint(toUserId) {
+  if (areFriends(toUserId)) return "你们已经互关，可以继续交流。";
+  return "还不是互关好友时，只能先发 1 条私信。";
+}
+
+function toggleFollow(userId) {
+  const user = currentUser();
+  if (!user || user.id === userId) return;
+  if (user.following.includes(userId)) {
+    user.following = user.following.filter((id) => id !== userId);
+  } else {
+    user.following.push(userId);
+  }
+  render();
+}
+
+function getCategory(categoryId) {
+  return state.categories.find((category) => category.id === categoryId) || state.categories[0];
+}
+
+function dreamsForCurrentUser() {
+  const user = currentUser();
+  if (!user) return [];
+  return state.dreams.filter((dream) => dream.userId === user.id);
+}
+
+function filteredDreams() {
+  const dreams = dreamsForCurrentUser();
+  if (activeFilter === "done") return dreams.filter((dream) => dream.done);
+  if (activeFilter === "open") return dreams.filter((dream) => !dream.done);
+  if (activeFilter.startsWith("category:")) {
+    const categoryId = activeFilter.replace("category:", "");
+    return dreams.filter((dream) => dream.categoryId === categoryId);
+  }
+  return dreams;
+}
+
+function render() {
+  renderShell();
+  renderSummary();
+  renderCategoryOptions();
+  renderFilters();
+  renderViews();
+  saveState();
+}
+
+function renderShell() {
+  const user = currentUser();
+  const loggedIn = Boolean(user);
+  loginForm.hidden = loggedIn;
+  userBar.hidden = !loggedIn;
+  controls.hidden = !loggedIn;
+  tabs.hidden = !loggedIn;
+
+  if (!loggedIn) {
+    pageTitle.textContent = "梦想清单";
+    subtitle.textContent = "由 Lily 发起。输入你的名字，进入属于自己的梦想清单。";
+    document.title = "梦想清单";
+    document.querySelectorAll(".view").forEach((view) => {
+      view.hidden = true;
+    });
+    return;
+  }
+
+  pageTitle.textContent = "梦想清单";
+  subtitle.textContent = `${user.name}，这里是你的专属梦想空间，也能看见大家公开分享的愿望和完成情况。`;
+  document.title = `${user.name}的梦想清单`;
+  currentUserLabel.textContent = `当前用户：${user.name}`;
+
+  document.querySelectorAll(".tab").forEach((button) => {
+    button.classList.toggle("active", button.dataset.view === activeView);
+  });
+
+  document.querySelectorAll(".view").forEach((view) => {
+    view.hidden = view.id !== `${activeView}View`;
+  });
+}
+
+function renderSummary() {
+  const total = state.dreams.length;
+  const done = state.dreams.filter((dream) => dream.done).length;
+  const progress = total ? Math.round((done / total) * 100) : 0;
+  document.querySelector("#userCount").textContent = state.users.length;
+  document.querySelector("#doneCount").textContent = done;
+  document.querySelector("#totalCount").textContent = total;
+  document.querySelector("#progressText").textContent = `${progress}%`;
+}
+
+function renderCategoryOptions() {
+  categorySelect.innerHTML = "";
+  const recommendedGroup = document.createElement("optgroup");
+  recommendedGroup.label = "推荐类目";
+  const customGroup = document.createElement("optgroup");
+  customGroup.label = "自定义类目";
+
+  state.categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    if (isRecommendedCategory(category.id)) {
+      recommendedGroup.append(option);
+    } else {
+      customGroup.append(option);
+    }
+  });
+  categorySelect.append(recommendedGroup);
+  if (customGroup.children.length) categorySelect.append(customGroup);
+}
+
+function isRecommendedCategory(categoryId) {
+  return defaultCategories.some((category) => category.id === categoryId);
+}
+
+function renderFilters() {
+  document.querySelectorAll(".filter").forEach((button) => {
+    button.classList.toggle("active", button.dataset.filter === activeFilter);
+  });
+
+  categoryFilters.innerHTML = "";
+  state.categories.forEach((category) => {
+    const count = dreamsForCurrentUser().filter((dream) => dream.categoryId === category.id).length;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "filter category-filter";
+    button.dataset.filter = `category:${category.id}`;
+    button.classList.toggle("active", activeFilter === button.dataset.filter);
+    button.innerHTML = `
+      <span class="swatch" style="background:${category.color}"></span>
+      <span>${category.name}</span>
+      <span class="count">${count}</span>
+    `;
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+      render();
+    });
+    categoryFilters.append(button);
+  });
+}
+
+function renderViews() {
+  if (!currentUser()) return;
+  renderPersonalDreams();
+  renderAllDreams();
+  renderSharedDreams();
+  renderMessagesView();
+  renderInboxDreams();
+  renderStats();
+}
+
+function renderPersonalDreams() {
+  const dreams = filteredDreams();
+  dreamList.innerHTML = "";
+  viewTitle.textContent = titleForFilter();
+
+  if (!dreams.length) {
+    dreamList.append(emptyMessage("这里暂时没有梦想，先加一个新的吧。"));
+    return;
+  }
+
+  const groupedDreams = groupDreamsByCategory(dreams);
+  groupedDreams.forEach(({ category, dreams: categoryDreams }) => {
+    const section = document.createElement("section");
+    section.className = "category-section";
+    section.innerHTML = `
+      <div class="category-section-head">
+        <span class="dream-category" style="background:${category.color}">${escapeHtml(category.name)}</span>
+        <span>${categoryDreams.length} 个梦想</span>
+      </div>
+    `;
+    section.append(statusGroup("未完成", categoryDreams.filter((dream) => !dream.done), "open"));
+    section.append(
+      statusGroup(
+        "已完成",
+        categoryDreams
+          .filter((dream) => dream.done)
+          .sort((a, b) => (a.completedAt || 0) - (b.completedAt || 0)),
+        "done",
+      ),
+    );
+    dreamList.append(section);
+  });
+}
+
+function statusGroup(label, dreams, status) {
+  const group = document.createElement("div");
+  group.className = `status-group ${status}`;
+  if (!dreams.length) return group;
+
+  const heading = document.createElement("div");
+  heading.className = "status-group-head";
+  heading.innerHTML = `<span>${label}</span><small>${dreams.length}</small>`;
+  group.append(heading);
+
+  const list = document.createElement("div");
+  list.className = "category-dreams";
+  dreams.forEach((dream) => {
+    list.append(personalDreamCard(dream));
+  });
+  group.append(list);
+  return group;
+}
+
+function groupDreamsByCategory(dreams) {
+  return state.categories
+    .map((category) => ({
+      category,
+      dreams: dreams.filter((dream) => dream.categoryId === category.id),
+    }))
+    .filter((group) => group.dreams.length);
+}
+
+function personalDreamCard(dream) {
+    const category = getCategory(dream.categoryId);
+    const node = template.content.firstElementChild.cloneNode(true);
+    const check = node.querySelector(".dream-check");
+    const title = node.querySelector(".dream-title");
+    const badge = node.querySelector(".dream-category");
+    const shareCheck = node.querySelector(".share-check");
+    const nameCheck = node.querySelector(".name-check");
+    const personalShareSelect = node.querySelector(".personal-share-select");
+    const personalShareButton = node.querySelector(".personal-share-btn");
+    const deleteButton = node.querySelector(".delete-btn");
+
+    node.classList.toggle("done", dream.done);
+    node.classList.add("personal-dream-item");
+    check.checked = dream.done;
+    title.value = dream.title;
+    badge.remove();
+    node.style.borderLeftColor = category.color;
+    shareCheck.checked = dream.shared;
+    nameCheck.checked = dream.showName;
+    nameCheck.disabled = !dream.shared;
+    renderPersonalShareOptions(personalShareSelect, dream);
+    personalShareButton.disabled = personalShareSelect.disabled;
+
+    check.addEventListener("change", () => {
+      const isFirstCompletion = check.checked && !dream.firstCompletedAt;
+      dream.done = check.checked;
+      dream.completedAt = check.checked ? Date.now() : null;
+      if (isFirstCompletion) {
+        dream.firstCompletedAt = dream.completedAt;
+        showCelebration(dream.title);
+      }
+      render();
+    });
+
+    title.addEventListener("change", () => {
+      dream.title = title.value.trim() || dream.title;
+      render();
+    });
+
+    shareCheck.addEventListener("change", () => {
+      dream.shared = shareCheck.checked;
+      if (!dream.shared) dream.showName = false;
+      render();
+    });
+
+    nameCheck.addEventListener("change", () => {
+      dream.showName = nameCheck.checked;
+      render();
+    });
+
+    personalShareButton.addEventListener("click", () => {
+      const targetUserId = personalShareSelect.value;
+      if (!targetUserId || dream.sharedWith.includes(targetUserId)) return;
+      dream.sharedWith.push(targetUserId);
+      render();
+    });
+
+    deleteButton.addEventListener("click", () => {
+      state.dreams = state.dreams.filter((item) => item.id !== dream.id);
+      render();
+    });
+
+    return node;
+}
+
+function renderAllDreams() {
+  const dreams = [...state.dreams].sort(sortByUserThenTime);
+  allDreamList.innerHTML = "";
+  if (!dreams.length) {
+    allDreamList.append(emptyMessage("还没有人写下梦想。"));
+    return;
+  }
+  dreams.forEach((dream) => {
+    allDreamList.append(readOnlyDreamCard(dream, userName(dream.userId), { ownerVisible: true, context: "all" }));
+  });
+}
+
+function renderSharedDreams() {
+  const dreams = state.dreams.filter((dream) => dream.shared).sort((a, b) => b.createdAt - a.createdAt);
+  sharedDreamList.innerHTML = "";
+  if (!dreams.length) {
+    sharedDreamList.append(emptyMessage("分享大厅还没有公开的梦想。"));
+    return;
+  }
+  dreams.forEach((dream) => {
+    sharedDreamList.append(
+      readOnlyDreamCard(dream, dream.showName ? userName(dream.userId) : "匿名伙伴", {
+        ownerVisible: dream.showName,
+        context: "hall",
+      }),
+    );
+  });
+}
+
+function renderInboxDreams() {
+  const user = currentUser();
+  const dreams = user
+    ? state.dreams.filter((dream) => dream.userId !== user.id && dream.sharedWith.includes(user.id))
+    : [];
+  inboxDreamList.innerHTML = "";
+
+  if (!dreams.length) {
+    inboxDreamList.append(emptyMessage("还没有人把梦想单独分享给你。"));
+    return;
+  }
+
+  if (dreams.length) {
+    const sharedTitle = document.createElement("h3");
+    sharedTitle.className = "inbox-section-title";
+    sharedTitle.textContent = "分享给我的梦想";
+    inboxDreamList.append(sharedTitle);
+  }
+  dreams.forEach((dream) => {
+    inboxDreamList.append(readOnlyDreamCard(dream, userName(dream.userId), { ownerVisible: true, context: "inbox" }));
+  });
+}
+
+function renderMessagesView() {
+  const user = currentUser();
+  messagePeopleList.innerHTML = "";
+  if (!user) return;
+
+  const users = state.users.filter((item) => item.id !== user.id);
+  if (!users.length) {
+    messagePeopleList.append(emptyMessage("还没有其他用户。可以先切换用户，创建一个新名字来体验消息和互关。"));
+    return;
+  }
+
+  const friends = users.filter((person) => areFriends(person.id));
+  const strangers = users.filter((person) => !areFriends(person.id));
+  renderMessagePeopleGroup("好友", friends, "互关后是好友，可以持续私信交流。");
+  renderMessagePeopleGroup("陌生人", strangers, "未互关前，彼此只能先发送 1 条私信。");
+  renderMessageInbox();
+}
+
+function renderMessagePeopleGroup(label, users, hint) {
+  if (!users.length) return;
+  const section = document.createElement("section");
+  section.className = "message-people-section";
+  section.innerHTML = `
+    <div class="message-people-head">
+      <h3>${label}</h3>
+      <span>${hint}</span>
+    </div>
+  `;
+  const list = document.createElement("div");
+  list.className = "message-people-grid";
+  users.forEach((person) => {
+    const personDreams = state.dreams.filter((dream) => dream.userId === person.id);
+    const completed = personDreams.filter((dream) => dream.done).length;
+    const relation = friendRelationLabel(person.id);
+    const card = document.createElement("article");
+    card.className = "friend-card";
+    card.innerHTML = `
+      <div class="friend-card-main">
+        <strong>${escapeHtml(person.name)}</strong>
+        <span>${completed}/${personDreams.length} 个梦想已完成</span>
+        <small>${relation.hint}</small>
+      </div>
+      <button class="friend-action" type="button">${relation.action}</button>
+    `;
+    card.querySelector(".friend-action").addEventListener("click", () => {
+      toggleFollow(person.id);
+    });
+    list.append(card);
+  });
+  section.append(list);
+  messagePeopleList.append(section);
+}
+
+function friendRelationLabel(userId) {
+  if (areFriends(userId)) {
+    return {
+      action: "已是好友",
+      hint: "你们已经互关，可以持续私信交流。",
+    };
+  }
+  if (isFollowing(userId)) {
+    return {
+      action: "已关注",
+      hint: "等待对方也关注你，互关后成为好友。",
+    };
+  }
+  return {
+    action: "关注",
+    hint: "关注对方；对方也关注你后，就会成为好友。",
+  };
+}
+
+function messagesForCurrentUser() {
+  const user = currentUser();
+  if (!user) return [];
+  return state.messages
+    .filter((message) => message.toUserId === user.id || message.fromUserId === user.id)
+    .sort((a, b) => b.createdAt - a.createdAt);
+}
+
+function renderMessageInbox() {
+  const user = currentUser();
+  if (!user) return;
+  const messages = messagesForCurrentUser();
+  if (!messages.length) {
+    messagePeopleList.append(emptyMessage("还没有私信。你可以在所有人的梦想或分享大厅里，给感兴趣的人发第一条消息。"));
+    return;
+  }
+
+  const messageTitle = document.createElement("h3");
+  messageTitle.className = "inbox-section-title";
+  messageTitle.textContent = "私信记录";
+  messagePeopleList.append(messageTitle);
+
+  const list = document.createElement("div");
+  list.className = "message-list";
+  messages.forEach((message) => {
+    const isSent = message.fromUserId === user.id;
+    const item = document.createElement("article");
+    item.className = "message-item";
+    item.innerHTML = `
+      <div class="message-meta">
+        <strong>${isSent ? `我发给 ${escapeHtml(userName(message.toUserId))}` : escapeHtml(userName(message.fromUserId))}</strong>
+        <span>${isSent ? "已发送" : "发给我"}</span>
+      </div>
+      <p>${escapeHtml(message.text)}</p>
+    `;
+    list.append(item);
+  });
+  messagePeopleList.append(list);
+}
+
+function renderPersonalShareOptions(select, dream) {
+  const users = otherUsers();
+  select.innerHTML = "";
+  const availableUsers = users.filter((user) => !dream.sharedWith.includes(user.id));
+  if (!availableUsers.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = users.length ? "已分享给所有人" : "暂无其他用户";
+    select.append(option);
+    select.disabled = true;
+    return;
+  }
+
+  availableUsers.forEach((user) => {
+    const option = document.createElement("option");
+    option.value = user.id;
+    option.textContent = user.name;
+    select.append(option);
+  });
+  select.disabled = false;
+}
+
+function readOnlyDreamCard(dream, ownerLabel, options = {}) {
+  const category = getCategory(dream.categoryId);
+  const user = currentUser();
+  const ownerVisible = options.ownerVisible !== false;
+  const isOwner = user?.id === dream.userId;
+  const liked = Boolean(user && dream.likedBy.includes(user.id));
+  const canMessage = Boolean(user && ownerVisible && !isOwner && canSendPrivateMessage(dream.userId));
+  const messageHint = user && ownerVisible && !isOwner ? privateMessageHint(dream.userId) : "";
+  const article = document.createElement("article");
+  article.className = `dream-item readonly ${dream.done ? "done" : ""}`;
+  article.innerHTML = `
+    <span class="status-dot ${dream.done ? "complete" : ""}"></span>
+    <div class="dream-main">
+      <p class="readonly-title">${escapeHtml(dream.title)}</p>
+      <div class="meta-row">
+        <span class="dream-category" style="background:${category.color}">${escapeHtml(category.name)}</span>
+        <span>${escapeHtml(ownerLabel)}</span>
+        <span>${dream.done ? "已完成" : "未完成"}</span>
+        ${dream.shared ? "<span>已分享</span>" : ""}
+        ${dream.sharedWith.length ? `<span>单独分享 ${dream.sharedWith.length} 人</span>` : ""}
+      </div>
+      <div class="social-actions">
+        <button class="like-btn" type="button">${liked ? "已赞" : "点赞"} ${dream.likedBy.length}</button>
+        ${
+          ownerVisible && !isOwner
+            ? `<button class="follow-btn" type="button">${areFriends(dream.userId) ? "已是好友" : isFollowing(dream.userId) ? "已关注" : "关注"}</button>`
+            : ""
+        }
+        <select class="reshare-select" aria-label="选择转分享对象"></select>
+        <button class="reshare-btn" type="button">转分享给个人</button>
+      </div>
+      <div class="comments">${renderComments(dream)}</div>
+      <form class="comment-form">
+        <input type="text" placeholder="写一句鼓励或留言" required />
+        <button type="submit">评论</button>
+      </form>
+      ${
+        ownerVisible && !isOwner
+          ? `<form class="private-message-form">
+              <input type="text" placeholder="${canMessage ? "给对方发一条私信" : "互关前只能发送一条私信"}" ${canMessage ? "required" : "disabled"} />
+              <button type="submit" ${canMessage ? "" : "disabled"}>发私信</button>
+              <small>${messageHint}</small>
+            </form>`
+          : ""
+      }
+    </div>
+  `;
+
+  const likeButton = article.querySelector(".like-btn");
+  const followButton = article.querySelector(".follow-btn");
+  const commentForm = article.querySelector(".comment-form");
+  const reshareSelect = article.querySelector(".reshare-select");
+  const reshareButton = article.querySelector(".reshare-btn");
+  const privateMessageForm = article.querySelector(".private-message-form");
+
+  renderPersonalShareOptions(reshareSelect, dream);
+  reshareButton.disabled = reshareSelect.disabled;
+
+  likeButton.addEventListener("click", () => {
+    if (!user) return;
+    if (dream.likedBy.includes(user.id)) {
+      dream.likedBy = dream.likedBy.filter((id) => id !== user.id);
+    } else {
+      dream.likedBy.push(user.id);
+    }
+    render();
+  });
+
+  followButton?.addEventListener("click", () => {
+    toggleFollow(dream.userId);
+  });
+
+  reshareButton.addEventListener("click", () => {
+    const targetUserId = reshareSelect.value;
+    if (!targetUserId || dream.sharedWith.includes(targetUserId)) return;
+    dream.sharedWith.push(targetUserId);
+    render();
+  });
+
+  commentForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = commentForm.querySelector("input");
+    const text = input.value.trim();
+    if (!text || !user) return;
+    dream.comments.push({
+      id: createId("comment"),
+      userId: user.id,
+      text,
+      createdAt: Date.now(),
+    });
+    render();
+  });
+
+  privateMessageForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = privateMessageForm.querySelector("input");
+    const text = input.value.trim();
+    if (!text || !user || !canSendPrivateMessage(dream.userId)) return;
+    state.messages.push({
+      id: createId("message"),
+      fromUserId: user.id,
+      toUserId: dream.userId,
+      text,
+      createdAt: Date.now(),
+    });
+    activeView = "messages";
+    render();
+  });
+
+  return article;
+}
+
+function renderComments(dream) {
+  if (!dream.comments.length) {
+    return `<p class="comment-empty">还没有评论</p>`;
+  }
+  return dream.comments
+    .slice(-3)
+    .map(
+      (comment) => `
+        <p class="comment">
+          <strong>${escapeHtml(userName(comment.userId))}</strong>
+          <span>${escapeHtml(comment.text)}</span>
+        </p>
+      `,
+    )
+    .join("");
+}
+
+function renderStats() {
+  const total = state.dreams.length;
+  const done = state.dreams.filter((dream) => dream.done).length;
+  const open = total - done;
+  const shared = state.dreams.filter((dream) => dream.shared).length;
+  const likes = state.dreams.reduce((sum, dream) => sum + dream.likedBy.length, 0);
+  const comments = state.dreams.reduce((sum, dream) => sum + dream.comments.length, 0);
+  const progress = total ? Math.round((done / total) * 100) : 0;
+
+  statCards.innerHTML = "";
+  [
+    ["填写人数", state.users.length],
+    ["总梦想", total],
+    ["已完成", done],
+    ["未完成", open],
+    ["已分享", shared],
+    ["点赞", likes],
+    ["评论", comments],
+    ["完成率", `${progress}%`],
+  ].forEach(([label, value]) => {
+    const card = document.createElement("div");
+    card.className = "stat-card";
+    card.innerHTML = `<strong>${value}</strong><span>${label}</span>`;
+    statCards.append(card);
+  });
+
+  userBars.innerHTML = "";
+  if (!state.users.length) {
+    userBars.append(emptyMessage("还没有统计数据。"));
+    return;
+  }
+
+  state.users.forEach((user) => {
+    const dreams = state.dreams.filter((dream) => dream.userId === user.id);
+    const userDone = dreams.filter((dream) => dream.done).length;
+    const userOpen = dreams.length - userDone;
+    const doneWidth = dreams.length ? Math.max(4, Math.round((userDone / dreams.length) * 100)) : 0;
+    const openWidth = dreams.length ? Math.max(4, 100 - doneWidth) : 0;
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `
+      <div class="bar-label">
+        <strong>${user.name}</strong>
+        <span>${userDone} 已完成 / ${userOpen} 未完成</span>
+      </div>
+      <div class="bar-track">
+        <span class="bar-done" style="width:${doneWidth}%"></span>
+        <span class="bar-open" style="width:${openWidth}%"></span>
+      </div>
+    `;
+    userBars.append(row);
+  });
+}
+
+function titleForFilter() {
+  if (activeFilter === "done") return "我的已完成";
+  if (activeFilter === "open") return "我的未完成";
+  if (activeFilter.startsWith("category:")) {
+    const category = getCategory(activeFilter.replace("category:", ""));
+    return `我的${category.name}`;
+  }
+  return `${currentUser()?.name || "我的"}的梦想清单`;
+}
+
+function emptyMessage(text) {
+  const empty = document.createElement("p");
+  empty.className = "empty-state";
+  empty.textContent = text;
+  return empty;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function sortByUserThenTime(a, b) {
+  const userA = userName(a.userId);
+  const userB = userName(b.userId);
+  if (userA !== userB) return userA.localeCompare(userB, "zh-CN");
+  return b.createdAt - a.createdAt;
+}
+
+function openExportPreview() {
+  const user = currentUser();
+  if (!user) return;
+  const dreams = dreamsForCurrentUser();
+  if (!dreams.length) {
+    alert("先写下一个梦想，再生成你的梦想清单。");
+    return;
+  }
+  drawDreamPoster();
+  exportModal.hidden = false;
+}
+
+function closeExportPreview() {
+  exportModal.hidden = true;
+}
+
+function downloadDreamPoster() {
+  drawDreamPoster();
+  const user = currentUser();
+  const link = document.createElement("a");
+  link.download = `${user?.name || "我的"}的梦想清单.png`;
+  link.href = exportCanvas.toDataURL("image/png");
+  link.click();
+}
+
+function printDreamPoster() {
+  drawDreamPoster();
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) return;
+  const imageUrl = exportCanvas.toDataURL("image/png");
+  printWindow.document.write(`
+    <!doctype html>
+    <html lang="zh-CN">
+      <head>
+        <meta charset="utf-8" />
+        <title>梦想清单</title>
+        <style>
+          body { margin: 0; display: grid; place-items: center; background: #f4f6f4; }
+          img { width: min(100vw, 800px); height: auto; }
+          @media print {
+            body { background: #fff; }
+            img { width: 100%; page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body><img src="${imageUrl}" alt="梦想清单" /></body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
+function drawDreamPoster() {
+  const user = currentUser();
+  if (!user || !exportCanvas) return;
+  const canvas = exportCanvas;
+  const ctx = canvas.getContext("2d");
+  const width = 1200;
+
+  const dreams = dreamsForCurrentUser();
+  const groups = posterGroupsForDreams(dreams);
+  const doneCount = dreams.filter((dream) => dream.done).length;
+  const progress = dreams.length ? Math.round((doneCount / dreams.length) * 100) : 0;
+  canvas.width = width;
+  canvas.height = 100;
+  const layout = posterDreamLayout(ctx, groups, 650);
+  const height = Math.max(1800, layout.height + 160);
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.fillStyle = "#fffdf9";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#8a623e";
+  ctx.lineWidth = 7;
+  ctx.strokeRect(36, 36, width - 72, height - 72);
+
+  drawPosterHeader(ctx, user.name, dreams.length, doneCount, progress);
+  drawPosterPyramid(ctx, groups);
+  drawPosterDreamGroups(ctx, layout);
+  drawPosterFooter(ctx, groups, dreams.length, layout.height + 48);
+}
+
+function drawPosterHeader(ctx, userNameText, total, done, progress) {
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#171a20";
+  ctx.font = "700 46px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(`${userNameText}的梦想清单`, 600, 105);
+
+  ctx.font = "600 22px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillStyle = "#6d7280";
+  ctx.fillText(`${total} 个梦想 · ${done} 个已完成 · 完成度 ${progress}%`, 600, 148);
+}
+
+function drawPosterPyramid(ctx, groups) {
+  const categories = groups.length ? groups.map((group) => group.category) : defaultCategories.slice(0, 5);
+  const levels = categories.slice(0, 8);
+  const topY = 210;
+  const bottomY = 545;
+  const centerX = 690;
+  const topWidth = 56;
+  const bottomWidth = 500;
+  const levelHeight = (bottomY - topY) / levels.length;
+
+  levels.forEach((category, index) => {
+    const y1 = topY + index * levelHeight;
+    const y2 = topY + (index + 1) * levelHeight;
+    const ratio1 = (y1 - topY) / (bottomY - topY);
+    const ratio2 = (y2 - topY) / (bottomY - topY);
+    const half1 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio1;
+    const half2 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio2;
+    ctx.beginPath();
+    ctx.moveTo(centerX - half1, y1);
+    ctx.lineTo(centerX + half1, y1);
+    ctx.lineTo(centerX + half2, y2);
+    ctx.lineTo(centerX - half2, y2);
+    ctx.closePath();
+    ctx.fillStyle = category.color;
+    ctx.globalAlpha = 0.94;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    const labelY = y1 + levelHeight / 2;
+    drawPosterCheck(ctx, 180, labelY - 17, category.color, true);
+    drawPosterChip(ctx, 240, labelY - 22, 230, 44, category.color, category.name);
+
+    ctx.strokeStyle = category.color;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(470, labelY);
+    ctx.lineTo(centerX - (half1 + half2) / 2 - 8, labelY);
+    ctx.stroke();
+  });
+}
+
+function posterGroupsForDreams(dreams) {
+  const categoryMap = new Map(state.categories.map((category) => [category.id, category]));
+  defaultCategories.forEach((category) => {
+    if (!categoryMap.has(category.id)) categoryMap.set(category.id, category);
+  });
+
+  const groupsById = new Map();
+  dreams.forEach((dream) => {
+    const category = categoryMap.get(dream.categoryId) || {
+      id: dream.categoryId || "uncategorized",
+      name: "未分类",
+      color: "#6d7280",
+    };
+    if (!groupsById.has(category.id)) {
+      groupsById.set(category.id, { category, dreams: [] });
+    }
+    groupsById.get(category.id).dreams.push(dream);
+  });
+
+  return [...categoryMap.values()]
+    .map((category) => groupsById.get(category.id))
+    .filter(Boolean)
+    .concat([...groupsById.values()].filter((group) => !categoryMap.has(group.category.id)));
+}
+
+function posterDreamLayout(ctx, groups, startY) {
+  const totalItems = groups.reduce((sum, group) => sum + group.dreams.length, 0) || 1;
+  const itemFont = totalItems > 44 ? 20 : totalItems > 32 ? 22 : 24;
+  const lineHeight = itemFont + 10;
+  const groupGap = totalItems > 36 ? 26 : 34;
+  const boxPaddingTop = 60;
+  const boxPaddingBottom = 26;
+  const textMaxWidth = 650;
+  ctx.font = `500 ${itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
+
+  const boxMeta = groups.map((group) => {
+    const dreams = [...group.dreams].sort((a, b) => Number(a.done) - Number(b.done) || a.createdAt - b.createdAt);
+    const items = dreams.map((dream) => {
+      const lines = wrapCanvasText(ctx, dream.title, textMaxWidth);
+      return {
+        dream,
+        lines,
+        itemHeight: Math.max(40, lines.length * lineHeight + 8),
+      };
+    });
+    return {
+      group,
+      items,
+      boxHeight: boxPaddingTop + boxPaddingBottom + items.reduce((sum, item) => sum + item.itemHeight, 0),
+    };
+  });
+  const contentHeight = boxMeta.reduce((sum, item) => sum + item.boxHeight, 0) + Math.max(0, boxMeta.length - 1) * groupGap;
+  return {
+    startY,
+    itemFont,
+    lineHeight,
+    groupGap,
+    groups: boxMeta,
+    height: startY + contentHeight,
+  };
+}
+
+function drawPosterDreamGroups(ctx, layout) {
+  const left = 116;
+  const right = 1084;
+  const boxWidth = right - left;
+  let y = layout.startY;
+
+  layout.groups.forEach(({ group, items, boxHeight }) => {
+    drawDashedBox(ctx, left, y, boxWidth, boxHeight);
+    drawPosterChip(ctx, right - 210, y + 28, 190, 48, group.category.color, group.category.name);
+
+    let itemY = y + 56;
+    items.forEach(({ dream, lines, itemHeight }) => {
+      drawPosterCheck(ctx, left + 28, itemY - 22, group.category.color, dream.done);
+      ctx.textAlign = "left";
+      ctx.fillStyle = dream.done ? "#2a2f38" : "#171a20";
+      ctx.font = `500 ${layout.itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
+      lines.forEach((line, lineIndex) => {
+        ctx.fillText(line, left + 92, itemY + 4 + lineIndex * layout.lineHeight);
+      });
+      itemY += itemHeight;
+    });
+
+    y += boxHeight + layout.groupGap;
+  });
+}
+
+function drawPosterFooter(ctx, groups, total, y) {
+  const shown = groups.reduce((sum, group) => sum + group.dreams.length, 0);
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.fillStyle = shown === total ? "#6d7280" : "#c7582b";
+  ctx.font = "600 18px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(`已完整呈现 ${shown}/${total} 个梦想`, 600, y);
+  ctx.restore();
+}
+
+function drawDashedBox(ctx, x, y, width, height) {
+  ctx.save();
+  ctx.strokeStyle = "#171a20";
+  ctx.lineWidth = 3;
+  ctx.setLineDash([30, 18]);
+  ctx.strokeRect(x, y, width, height);
+  ctx.restore();
+}
+
+function drawPosterCheck(ctx, x, y, color, checked) {
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#9aa0ad";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, 36, 36);
+  if (checked) {
+    ctx.strokeStyle = "#ff1c18";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(x + 8, y + 20);
+    ctx.lineTo(x + 16, y + 28);
+    ctx.lineTo(x + 30, y + 8);
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 3, y + 3, 30, 30);
+  }
+  ctx.restore();
+}
+
+function drawPosterChip(ctx, x, y, width, height, color, text) {
+  ctx.save();
+  ctx.fillStyle = color;
+  roundRect(ctx, x, y, width, height, 8);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "700 22px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(truncateCanvasText(ctx, text, width - 24), x + width / 2, y + height / 2 + 8);
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function truncateCanvasText(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let result = text;
+  while (result.length > 1 && ctx.measureText(`${result}…`).width > maxWidth) {
+    result = result.slice(0, -1);
+  }
+  return `${result}…`;
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const lines = [];
+  let current = "";
+  Array.from(String(text)).forEach((char) => {
+    const candidate = current + char;
+    if (current && ctx.measureText(candidate).width > maxWidth) {
+      lines.push(current);
+      current = char;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [""];
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function login(name) {
+  const trimmedName = name.trim();
+  if (!trimmedName) return;
+  let user = state.users.find((item) => item.name === trimmedName);
+  if (!user) {
+    user = normalizeUser({ id: createId("user"), name: trimmedName });
+    state.users.push(user);
+  }
+  state.currentUserId = user.id;
+  activeView = "mine";
+  activeFilter = "all";
+  loginName.value = "";
+  render();
+}
+
+loginForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  login(loginName.value);
+});
+
+logoutButton.addEventListener("click", () => {
+  state.currentUserId = "";
+  activeView = "mine";
+  render();
+});
+
+tabs.addEventListener("click", (event) => {
+  const button = event.target.closest(".tab");
+  if (!button) return;
+  activeView = button.dataset.view;
+  render();
+});
+
+dreamForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const user = currentUser();
+  const title = dreamInput.value.trim();
+  if (!user || !title) return;
+
+  state.dreams.unshift({
+    id: createId("dream"),
+    userId: user.id,
+    title,
+    categoryId: categorySelect.value,
+    done: false,
+    completedAt: null,
+    firstCompletedAt: null,
+    shared: false,
+    showName: true,
+    sharedWith: [],
+    likedBy: [],
+    comments: [],
+    createdAt: Date.now(),
+  });
+  dreamInput.value = "";
+  activeView = "mine";
+  activeFilter = "all";
+  render();
+});
+
+categoryForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = categoryInput.value.trim();
+  if (!name) return;
+
+  const category = {
+    id: `category-${Date.now()}`,
+    name,
+    color: categoryColor.value,
+  };
+  state.categories.push(category);
+  categoryInput.value = "";
+  activeFilter = `category:${category.id}`;
+  render();
+  categorySelect.value = category.id;
+});
+
+document.querySelector(".sidebar").addEventListener("click", (event) => {
+  const button = event.target.closest(".filter");
+  if (!button || button.classList.contains("category-filter")) return;
+  activeFilter = button.dataset.filter;
+  render();
+});
+
+document.querySelector("#resetDemo").addEventListener("click", () => {
+  const user = currentUser();
+  if (!user) return;
+  state.dreams = state.dreams.filter((dream) => dream.userId !== user.id);
+  state.dreams.push(
+    ...lilyDreams.map((dream) =>
+      normalizeDream({
+        ...dream,
+        id: createId("dream"),
+        userId: user.id,
+        shared: false,
+        showName: true,
+      }),
+    ),
+  );
+  activeFilter = "all";
+  render();
+});
+
+exportPosterButton.addEventListener("click", openExportPreview);
+closeExportButton.addEventListener("click", closeExportPreview);
+downloadPosterButton.addEventListener("click", downloadDreamPoster);
+printPosterButton.addEventListener("click", printDreamPoster);
+exportModal.addEventListener("click", (event) => {
+  if (event.target === exportModal) closeExportPreview();
+});
+
+render();
+loadCloudState();
+window.addEventListener("focus", refreshCloudState);
+setInterval(refreshCloudState, 15000);
+
+    </script>
+  </body>
+</html>
