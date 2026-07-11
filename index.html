@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>梦想清单 V2</title>
+    <title>梦想清单</title>
     <style>
 :root {
   color-scheme: light;
@@ -1251,7 +1251,7 @@ button[type="submit"],
   }
 }
 
-    </style>
+</style>
   </head>
   <body>
     <main class="app-shell">
@@ -2636,11 +2636,13 @@ function drawDreamPoster() {
   const width = 1200;
 
   const dreams = dreamsForCurrentUser();
-  const groups = groupDreamsByCategory(dreams);
+  const groups = posterGroupsForDreams(dreams);
   const doneCount = dreams.filter((dream) => dream.done).length;
   const progress = dreams.length ? Math.round((doneCount / dreams.length) * 100) : 0;
-  const layout = posterDreamLayout(groups, 650);
-  const height = Math.max(1800, layout.height + 92);
+  canvas.width = width;
+  canvas.height = 100;
+  const layout = posterDreamLayout(ctx, groups, 650);
+  const height = Math.max(1800, layout.height + 160);
   canvas.width = width;
   canvas.height = height;
 
@@ -2653,6 +2655,7 @@ function drawDreamPoster() {
   drawPosterHeader(ctx, user.name, dreams.length, doneCount, progress);
   drawPosterPyramid(ctx, groups);
   drawPosterDreamGroups(ctx, layout);
+  drawPosterFooter(ctx, groups, dreams.length, layout.height + 48);
 }
 
 function drawPosterHeader(ctx, userNameText, total, done, progress) {
@@ -2667,61 +2670,164 @@ function drawPosterHeader(ctx, userNameText, total, done, progress) {
 }
 
 function drawPosterPyramid(ctx, groups) {
-  const categories = groups.length ? groups.map((group) => group.category) : defaultCategories.slice(0, 5);
-  const levels = categories.slice(0, 8);
-  const topY = 210;
-  const bottomY = 545;
-  const centerX = 690;
-  const topWidth = 56;
-  const bottomWidth = 500;
-  const levelHeight = (bottomY - topY) / levels.length;
+  const levels = [
+    { name: "温暖/影响他人", color: "#00475d" },
+    { name: "有经济实力", color: "#f25c1b" },
+    { name: "志同道合伙伴", color: "#f0d615" },
+    { name: "有时间陪伴家人", color: "#a7cf00" },
+    { name: "健康身体", color: "#0b66b2" },
+  ];
+  const topY = 178;
+  const bottomY = 555;
+  const centerX = 720;
+  const bottomWidth = 520;
+  const levelHeights = [76, 78, 86, 96, 117];
+  const apex = { x: centerX, y: topY };
 
-  levels.forEach((category, index) => {
-    const y1 = topY + index * levelHeight;
-    const y2 = topY + (index + 1) * levelHeight;
-    const ratio1 = (y1 - topY) / (bottomY - topY);
-    const ratio2 = (y2 - topY) / (bottomY - topY);
-    const half1 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio1;
-    const half2 = topWidth / 2 + (bottomWidth / 2 - topWidth / 2) * ratio2;
+  const halfWidthAt = (y) => ((y - topY) / (bottomY - topY)) * (bottomWidth / 2);
+  const levelBounds = levels.map((level, index) => {
+    const y1 = topY + levelHeights.slice(0, index).reduce((sum, height) => sum + height, 0);
+    const y2 = y1 + levelHeights[index];
+    return {
+      ...level,
+      y1,
+      y2,
+      centerY: y1 + (y2 - y1) / 2,
+      half1: index === 0 ? 0 : halfWidthAt(y1),
+      half2: halfWidthAt(y2),
+    };
+  });
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(apex.x, apex.y);
+  ctx.lineTo(centerX + bottomWidth / 2, bottomY);
+  ctx.lineTo(centerX - bottomWidth / 2, bottomY);
+  ctx.closePath();
+  ctx.clip();
+
+  levelBounds.forEach((level, index) => {
     ctx.beginPath();
-    ctx.moveTo(centerX - half1, y1);
-    ctx.lineTo(centerX + half1, y1);
-    ctx.lineTo(centerX + half2, y2);
-    ctx.lineTo(centerX - half2, y2);
+    if (index === 0) {
+      ctx.moveTo(apex.x, apex.y);
+    } else {
+      ctx.moveTo(centerX - level.half1, level.y1);
+      ctx.lineTo(centerX + level.half1, level.y1);
+    }
+    ctx.lineTo(centerX + level.half2, level.y2);
+    ctx.lineTo(centerX - level.half2, level.y2);
     ctx.closePath();
-    ctx.fillStyle = category.color;
-    ctx.globalAlpha = 0.94;
+    ctx.fillStyle = level.color;
     ctx.fill();
-    ctx.globalAlpha = 1;
+  });
 
-    const labelY = y1 + levelHeight / 2;
-    drawPosterCheck(ctx, 180, labelY - 17, category.color, true);
-    drawPosterChip(ctx, 240, labelY - 22, 230, 44, category.color, category.name);
+  ctx.restore();
 
-    ctx.strokeStyle = category.color;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(apex.x, apex.y);
+  ctx.lineTo(centerX + bottomWidth / 2, bottomY);
+  ctx.lineTo(centerX, bottomY);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(20, 28, 36, 0.16)";
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(apex.x, apex.y);
+  ctx.lineTo(centerX + levelBounds[0].half2, levelBounds[0].y2);
+  ctx.lineTo(centerX, levelBounds[0].y2);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(5, 25, 34, 0.26)";
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
+  ctx.lineWidth = 1;
+  levelBounds.slice(1).forEach((level) => {
+    const y = level.y1;
+    const half = level.half1;
+    ctx.beginPath();
+    ctx.moveTo(centerX - half, y);
+    ctx.lineTo(centerX + half, y);
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  levelBounds.forEach((level, index) => {
+    const labelY = level.centerY;
+    const checkX = 356 - index * 54;
+    const chipX = checkX + 62;
+    drawPosterCheck(ctx, checkX, labelY - 17, level.color, true);
+    drawPosterChip(ctx, chipX, labelY - 22, 230, 44, level.color, level.name, 6);
+
+    ctx.strokeStyle = level.color;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(470, labelY);
-    ctx.lineTo(centerX - (half1 + half2) / 2 - 8, labelY);
+    ctx.moveTo(chipX + 230, labelY);
+    ctx.lineTo(centerX - (level.half1 + level.half2) / 2 - 8, labelY);
     ctx.stroke();
   });
 }
 
-function posterDreamLayout(groups, startY) {
+function posterGroupsForDreams(dreams) {
+  const categoryMap = new Map(state.categories.map((category) => [category.id, category]));
+  defaultCategories.forEach((category) => {
+    if (!categoryMap.has(category.id)) categoryMap.set(category.id, category);
+  });
+
+  const groupsById = new Map();
+  dreams.forEach((dream) => {
+    const category = categoryMap.get(dream.categoryId) || {
+      id: dream.categoryId || "uncategorized",
+      name: "未分类",
+      color: "#6d7280",
+    };
+    if (!groupsById.has(category.id)) {
+      groupsById.set(category.id, { category, dreams: [] });
+    }
+    groupsById.get(category.id).dreams.push(dream);
+  });
+
+  return [...categoryMap.values()]
+    .map((category) => groupsById.get(category.id))
+    .filter(Boolean)
+    .concat([...groupsById.values()].filter((group) => !categoryMap.has(group.category.id)));
+}
+
+function posterDreamLayout(ctx, groups, startY) {
   const totalItems = groups.reduce((sum, group) => sum + group.dreams.length, 0) || 1;
-  const itemHeight = totalItems > 44 ? 30 : totalItems > 32 ? 34 : 38;
-  const groupGap = totalItems > 36 ? 18 : 24;
-  const boxPadding = 70;
-  const boxMeta = groups.map((group) => ({
-    group,
-    itemHeight,
-    boxHeight: boxPadding + group.dreams.length * itemHeight,
-  }));
+  const itemFont = totalItems > 44 ? 20 : totalItems > 32 ? 22 : 24;
+  const lineHeight = itemFont + 10;
+  const groupGap = totalItems > 36 ? 26 : 34;
+  const boxPaddingTop = 60;
+  const boxPaddingBottom = 26;
+  const textMaxWidth = 650;
+  ctx.font = `500 ${itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
+
+  const boxMeta = groups.map((group) => {
+    const dreams = [...group.dreams].sort((a, b) => Number(a.done) - Number(b.done) || a.createdAt - b.createdAt);
+    const items = dreams.map((dream) => {
+      const lines = wrapCanvasText(ctx, dream.title, textMaxWidth);
+      return {
+        dream,
+        lines,
+        itemHeight: Math.max(40, lines.length * lineHeight + 8),
+      };
+    });
+    return {
+      group,
+      items,
+      boxHeight: boxPaddingTop + boxPaddingBottom + items.reduce((sum, item) => sum + item.itemHeight, 0),
+    };
+  });
   const contentHeight = boxMeta.reduce((sum, item) => sum + item.boxHeight, 0) + Math.max(0, boxMeta.length - 1) * groupGap;
   return {
     startY,
-    itemHeight,
-    itemFont: itemHeight < 34 ? 21 : 24,
+    itemFont,
+    lineHeight,
     groupGap,
     groups: boxMeta,
     height: startY + contentHeight,
@@ -2734,31 +2840,47 @@ function drawPosterDreamGroups(ctx, layout) {
   const boxWidth = right - left;
   let y = layout.startY;
 
-  layout.groups.forEach(({ group, boxHeight }) => {
-    const dreams = [...group.dreams].sort((a, b) => Number(a.done) - Number(b.done) || a.createdAt - b.createdAt);
-
+  layout.groups.forEach(({ group, items, boxHeight }) => {
     drawDashedBox(ctx, left, y, boxWidth, boxHeight);
-    drawPosterChip(ctx, right - 210, y + 28, 190, 48, group.category.color, group.category.name);
+    const chipY = y + boxHeight / 2 - 24;
+    ctx.save();
+    ctx.fillStyle = "#fffdf9";
+    ctx.fillRect(right - 236, chipY - 12, 230, 72);
+    ctx.restore();
+    drawPosterChip(ctx, right - 220, chipY, 200, 48, group.category.color, group.category.name, 5);
 
-    dreams.forEach((dream, index) => {
-      const itemY = y + 56 + index * layout.itemHeight;
+    let itemY = y + 56;
+    items.forEach(({ dream, lines, itemHeight }) => {
       drawPosterCheck(ctx, left + 28, itemY - 22, group.category.color, dream.done);
       ctx.textAlign = "left";
       ctx.fillStyle = dream.done ? "#2a2f38" : "#171a20";
       ctx.font = `500 ${layout.itemFont}px PingFang SC, Microsoft YaHei, sans-serif`;
-      const title = truncateCanvasText(ctx, dream.title, boxWidth - 360);
-      ctx.fillText(title, left + 92, itemY + 4);
+      lines.forEach((line, lineIndex) => {
+        ctx.fillText(line, left + 92, itemY + 4 + lineIndex * layout.lineHeight);
+      });
+      itemY += itemHeight;
     });
 
     y += boxHeight + layout.groupGap;
   });
 }
 
+function drawPosterFooter(ctx, groups, total, y) {
+  const shown = groups.reduce((sum, group) => sum + group.dreams.length, 0);
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.fillStyle = shown === total ? "#6d7280" : "#c7582b";
+  ctx.font = "600 18px PingFang SC, Microsoft YaHei, sans-serif";
+  ctx.fillText(`已完整呈现 ${shown}/${total} 个梦想`, 600, y);
+  ctx.restore();
+}
+
 function drawDashedBox(ctx, x, y, width, height) {
   ctx.save();
   ctx.strokeStyle = "#171a20";
   ctx.lineWidth = 3;
-  ctx.setLineDash([30, 18]);
+  ctx.setLineDash([34, 22]);
+  ctx.lineCap = "butt";
   ctx.strokeRect(x, y, width, height);
   ctx.restore();
 }
@@ -2785,10 +2907,10 @@ function drawPosterCheck(ctx, x, y, color, checked) {
   ctx.restore();
 }
 
-function drawPosterChip(ctx, x, y, width, height, color, text) {
+function drawPosterChip(ctx, x, y, width, height, color, text, radius = 8) {
   ctx.save();
   ctx.fillStyle = color;
-  roundRect(ctx, x, y, width, height, 8);
+  roundRect(ctx, x, y, width, height, radius);
   ctx.fill();
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
@@ -2819,6 +2941,22 @@ function truncateCanvasText(ctx, text, maxWidth) {
     result = result.slice(0, -1);
   }
   return `${result}…`;
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const lines = [];
+  let current = "";
+  Array.from(String(text)).forEach((char) => {
+    const candidate = current + char;
+    if (current && ctx.measureText(candidate).width > maxWidth) {
+      lines.push(current);
+      current = char;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [""];
 }
 
 function clamp(value, min, max) {
@@ -2941,6 +3079,6 @@ loadCloudState();
 window.addEventListener("focus", refreshCloudState);
 setInterval(refreshCloudState, 15000);
 
-    </script>
+</script>
   </body>
 </html>
